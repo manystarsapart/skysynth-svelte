@@ -1,7 +1,7 @@
+import type { AudioEngine } from "$lib/audio/audioEngine.svelte";
 import { log } from "$lib/utils/logging";
-import { pressedKeys, resolveKeydownMIDI, keyStates } from "./keyboardEngine.svelte";
+import { type KeyboardEngine } from "./keyboardEngine.svelte";
 import { leftKeyboardKeys, pitchMap, rightKeyboardKeys } from "./maps"
-import { resolveTrOC, setTranspose } from "./tranoctv";
 
 // ====================================================
 // KEY CONFIGS
@@ -17,40 +17,39 @@ const trocKeys = new Set(["arrowup", "arrowdown", "arrowleft", "arrowright", "["
 // KEY DOWN/UP HANDLERS (used in $lib/components/keyboard/KeyCap.svelte)
 // ====================================================
 
-export function handleKeydown(e: KeyboardEvent) {
+export function handleKeydown(e: KeyboardEvent, engine: KeyboardEngine, audio: AudioEngine) {
     let k = e.key.toLowerCase();
     // console.log(e.location);
     if (!excludedKeys.has(k)) e.preventDefault();
-    if (pressedKeys.has(k)) {
-        // repeated call. happens when holding note
+
+    const type: string = classifyKey(k, true);
+
+    const trackedKey = (type === 'tmod') ? `${k}${e.location === 1 ? 'L' : 'R'}` : k; // CATCHES TMOD & ADDS LOC EARLY
+    
+    // removing repeat keys from holding
+    if (engine.isDown(trackedKey)) return;   
+    engine.markDown(trackedKey);
+
+    if (type === 'note') {
+        const midi = engine.noteDown(trackedKey /*, extraSemitones */);
+        if (midi !== null) audio.play(midi); // TODO: AUDIO ENGINE
         return;
-    } else {
-        pressedKeys.add(k);
     }
-    switch (classifyKey(k, true)) { 
-        case "excl":
-            break;
-        case "note":
-            // note
-            resolveKeydownMIDI(k);
-            break;
+
+    // NON-NOTE type handling
+    switch (type) { 
+        case "excl": break;
         case "modi":
             // space & enter
             // technically no action really needs to be done here..
             break;
-        case "tmod":
-            // modifier key
-            let location = e.location; // 1 is L, 2 is R
-            pressedKeys.delete(k);
-            pressedKeys.add(`${k}${(location == 1) ? "L" : "R"}`);
-            break;
         case "tran":
             // transpose key
-            setTranspose(pitchMap[k]);
+            engine.transposeTo(pitchMap[trackedKey]);
             break;
         case "troc":
             // +1 / -1 transpose & octave key
-            resolveTrOC(k);
+            engine.resolveTrOC(trackedKey);
             break;
         case "menu":
             // menu key
@@ -59,19 +58,26 @@ export function handleKeydown(e: KeyboardEvent) {
             // TODO
             break;
     } 
-    // console.log(pressedKeys);
+
+    log(`[HANDLEKEYDOWN] ${trackedKey} --> [${type}] down`);
 }
 
-export function handleKeyup(e: KeyboardEvent) {
+export function handleKeyup(e: KeyboardEvent, engine: KeyboardEngine, audio: AudioEngine) {
     let k = e.key.toLowerCase(); // PREVENTS "W" and "w" from both being in the keypress set, for example  
     e.preventDefault(); // is this even needed?
-    if (classifyKey(k, false) === "tmod") {
-        pressedKeys.delete(`${k}${e.location == 1 ? "L" : "R"}`)
-    } else {
-        pressedKeys.delete(k);
-    }
-    // console.log(pressedKeys);
 
+    const type: string = classifyKey(k, false);
+
+    if (type === 'note') {
+        const midi = engine.noteUp(k);
+        if (midi !== null) audio.release(midi);
+        return;
+    }
+
+    const trackedKey = (type === 'tmod') ? `${k}${e.location === 1 ? 'L' : 'R'}` : k;
+    engine.markUp(trackedKey);
+
+    log(`[HANDLEKEYUP] ${trackedKey} --> [${type}] up`);
 }
 
 // ====================================================
@@ -93,6 +99,5 @@ export function classifyKey(k: string, isKeyDown: boolean) {
 
     // console.log(pressedKeys);
 
-    log(`keypress: ${k} --> ${keyType} (${isKeyDown ? "down" : "up"})`);
     return keyType;
 }

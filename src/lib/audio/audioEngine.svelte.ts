@@ -1,13 +1,18 @@
-export function play(note: number) {
-    // note should be a sanitised MIDI
-    console.log("played note: " + note);
-}
+import { log } from "$lib/utils/logging";
 
-export function release(note: number) {
-    // note should be a sanitised MIDI
-    console.log("released note: " + note);
-}
+export function createAudioEngine() {
+    function play(midi: number) {
+        // TODO
+        log(`[AUDIO] played midi note: ${midi}`);
+     }
+    function release(midi: number) {
+        // TODO
+        log(`[AUDIO] released midi note: ${midi}`);
+    }
+    function setInstrument(inst: string) {
+        // TODO
+    }
+    return { play, release, setInstrument };
+  }
 
-export function setInstrument(inst: string) {
-    // TODO
-}
+  export type AudioEngine = ReturnType<typeof createAudioEngine>;
