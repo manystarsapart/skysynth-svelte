@@ -73,5 +73,3 @@
 <!-- <button onclick={() => skyStates.count += 1}>
     among us. count is {skyStates.count}
 </button> -->
-
-<KeyCap />

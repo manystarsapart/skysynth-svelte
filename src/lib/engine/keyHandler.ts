@@ -31,7 +31,7 @@ export function handleKeydown(e: KeyboardEvent, engine: KeyboardEngine, audio: A
     engine.markDown(trackedKey);
 
     if (type === 'note') {
-        const midi = engine.noteDown(trackedKey /*, extraSemitones */);
+        const midi = engine.noteDown(trackedKey);
         if (midi !== null) audio.play(midi); // TODO: AUDIO ENGINE
         return;
     }

@@ -1,17 +1,31 @@
 <script lang="ts">
-// COMPONENT FOUND IN PLAYER PAGE ($lib/routes/player/+page.svelte)
-//     import { onMount } from "svelte";
-//     import { handleKeydown, handleKeyup } from "$lib/engine/keyClassifier";
-//   import { createKeyboardEngine } from "$lib/engine/keyboardEngine.svelte";
-    
-//     const engine = createKeyboardEngine();
-//     onMount(() => {
-//         document.addEventListener("keydown", handleKeydown(e, engine));
-//         document.addEventListener("keyup", handleKeyup)
-
-//         return () => {
-//             document.removeEventListener("keydown", handleKeydown(e, engine));
-//             document.removeEventListener("keyup", handleKeyup);
-//         };
-//     });
+    import type { KeyboardEngine } from '$lib/engine/keyboardEngine.svelte';
+    import type { AudioEngine } from '$lib/audio/audioEngine.svelte';
+  
+    let { keyId, engine, audio }: {
+        keyId: string; engine: KeyboardEngine; audio: AudioEngine;
+    } = $props();
+  
+    // THIS IS ONLY FOR TOUCH!!! 
+    function down(e: PointerEvent) {
+        e.preventDefault();
+        const midi = engine.noteDown(keyId);
+        if (midi !== null) audio.play(midi);
+        // VISUAL CHANGES: TO INTERACT WITH KEYBOARD ENGINE
+    }
+    function up(e: PointerEvent) {
+        e.preventDefault();
+        const midi = engine.noteUp(keyId);
+        if (midi !== null) audio.release(midi);
+        // VISUAL CHANGES: TO INTERACT WITH KEYBOARD ENGINE 
+    }
 </script>
+<!--   
+  <div
+    class="keyboard-key ..."
+    class:key-active={engine.pressedKeys.has(keyId)}
+    onpointerdown={down}
+    onpointerup={up}
+  >
+    {keyId.toUpperCase()}
+  </div> -->
