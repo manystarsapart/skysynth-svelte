@@ -1,7 +1,7 @@
 import { log } from "$lib/utils/logging";
 import { keyStates } from "./keyboardEngine.svelte";
 
-export function transposeToKey(k: number) {
+export function setTranspose(k: number) {
     // i thought this would be more complicated. haha
     keyStates.transposeValue = k;
 }
@@ -15,10 +15,10 @@ export function octaveBy(count: number){
 export function resolveTrOC(k: string) {
     switch (k) {
         case "[":
-            transposeToKey(keyStates.transposeValue - 1); // perm -1
+            setTranspose(keyStates.transposeValue - 1); // perm -1
             break;
         case "]":
-            transposeToKey(keyStates.transposeValue + 1); // perm +1
+            setTranspose(keyStates.transposeValue + 1); // perm +1
             break;
         case "arrowdown":
         case "arrowleft":

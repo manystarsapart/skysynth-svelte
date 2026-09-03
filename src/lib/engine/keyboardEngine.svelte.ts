@@ -10,7 +10,7 @@ export const skyStates = $state({
     skysynthVersion: "0.20.6",
     skysynthLastUpdateDate: "2026-09-03",
     skysynthSheetVersion: "1.2",
-    skysynthVersionOnLastVisit: null,
+    skysynthVersionOnLastVisit: null as string | null,
     // not ported from vanilla: cosmetic changes
 
     
@@ -36,7 +36,7 @@ export const pressedKeys = new Set<string>();
 // ====================================================
 
 export function createKeyboardEngine() {
-
+    
 }
 
 // ====================================================
@@ -68,7 +68,7 @@ export function resolveKeydownMIDI(k: string) {
         if (pressedKeys.has("altR")) modifier += 1; // altR --> right KB +1
     } else {
         // this shouldnt happen...
-        alert("error! contact dev");
+        console.error(`error: unexpected k (${k}) landed outside L & R keyboard.`);
     }
     
     log(`modifier: ${String(modifier)}`);

@@ -1,7 +1,7 @@
 import { log } from "$lib/utils/logging";
 import { pressedKeys, resolveKeydownMIDI, keyStates } from "./keyboardEngine.svelte";
 import { leftKeyboardKeys, pitchMap, rightKeyboardKeys } from "./maps"
-import { resolveTrOC, transposeToKey } from "./tranoctv";
+import { resolveTrOC, setTranspose } from "./tranoctv";
 
 // ====================================================
 // KEY CONFIGS
@@ -20,7 +20,7 @@ const trocKeys = new Set(["arrowup", "arrowdown", "arrowleft", "arrowright", "["
 export function handleKeydown(e: KeyboardEvent) {
     let k = e.key.toLowerCase();
     // console.log(e.location);
-    if (!excludedKeys.has(e.key)) e.preventDefault();
+    if (!excludedKeys.has(k)) e.preventDefault();
     if (pressedKeys.has(k)) {
         // repeated call. happens when holding note
         return;
@@ -46,7 +46,7 @@ export function handleKeydown(e: KeyboardEvent) {
             break;
         case "tran":
             // transpose key
-            transposeToKey(pitchMap[k]);
+            setTranspose(pitchMap[k]);
             break;
         case "troc":
             // +1 / -1 transpose & octave key
