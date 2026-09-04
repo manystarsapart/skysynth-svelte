@@ -4,53 +4,35 @@ on:
   push:
     branches: 'main'
 
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
 jobs:
   build_site:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v7
-
-      # If you're using pnpm, add this step then change the commands and cache key below to use `pnpm`
-      # - name: Install pnpm
-      #   uses: pnpm/action-setup@v6
-      #   with:
-      #     version: 8
-
-      - name: Install Node.js
-        uses: actions/setup-node@v6
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v6
         with:
           node-version: 20
           cache: npm
-
-      - name: Install dependencies
-        run: npm i
-
-      - name: build
-        env:
-          BASE_PATH: '/${{ github.event.repository.name }}'
-        run: |
-          npm run build
-
-      - name: Upload Artifacts
-        uses: actions/upload-pages-artifact@v5
+      - run: npm ci
+      - run: npm run build
+      - name: Confirm build output
+        run: ls -la build
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v5
         with:
-          # this should match the `pages` option in your adapter-static options
           path: 'build'
 
   deploy:
     needs: build_site
     runs-on: ubuntu-latest
-
-    permissions:
-      pages: write
-      id-token: write
-
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
-
     steps:
-      - name: Deploy
-        id: deployment
+      - id: deployment
         uses: actions/deploy-pages@v5
