@@ -1,8 +1,8 @@
 <script>
-  import { createAudioEngine } from "$lib/audio/audioEngine.svelte";
+import { createAudioEngine } from "$lib/audio/audioEngine.svelte";
 import { createKeyboardEngine } from "$lib/engine/keyboardEngine.svelte";
 import { handleKeydown, handleKeyup } from "$lib/engine/keyHandler";
-  import { onMount } from "svelte";
+import { onMount } from "svelte";
 
 const engine = createKeyboardEngine();
 const audio = createAudioEngine();
