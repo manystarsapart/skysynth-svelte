@@ -20,8 +20,8 @@
         // VISUAL CHANGES: TO INTERACT WITH KEYBOARD ENGINE 
     }
 </script>
-<!--   
-  <div
+  
+  <!-- <div
     class="keyboard-key ..."
     class:key-active={engine.pressedKeys.has(keyId)}
     onpointerdown={down}

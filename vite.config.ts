@@ -19,7 +19,7 @@ export default defineConfig({
 				strict: true
 			}),
 			paths: {
-				base: '/player'
+				base: ''
 			}
 		})
 	]

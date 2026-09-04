@@ -1,5 +1,6 @@
 <script>
 import { createAudioEngine } from "$lib/audio/audioEngine.svelte";
+  import KeyboardHalf from "$lib/components/keyboard/KeyboardHalf.svelte";
 import { createKeyboardEngine } from "$lib/engine/keyboardEngine.svelte";
 import { handleKeydown, handleKeyup } from "$lib/engine/keyHandler";
 import { onMount } from "svelte";
@@ -15,5 +16,5 @@ onMount(() => { audio.loadInstrument('piano'); });
   onkeyup={(e) => handleKeyup(e, engine, audio)}
 />
 
-<!-- <KeyboardHalf side="left" {engine} {audio} />
-<KeyboardHalf side="right" {engine} {audio} /> -->
+<!-- <KeyboardHalf side="left" {engine} {audio} /> -->
+<!-- <KeyboardHalf side="right" {engine} {audio} /> -->
