@@ -13,12 +13,22 @@ const tempModifierKeys = new Set(["alt", "shift"]);
 const menuKeys = new Set(["escape", "backspace", "tab", "delete", "\\"]);
 const trocKeys = new Set(["arrowup", "arrowdown", "arrowleft", "arrowright", "[", "]"]); // troc = transpose & octave
 
+const shiftMap: Record<string, string> = {
+    ':': ';',
+    '<': ',',
+    '>': '.',
+    '?': '/',
+};
+
+function getBaseKey(k: string): string {
+    return shiftMap[k] || k;
+}
 // ====================================================
 // KEY DOWN/UP HANDLERS (used in $lib/components/keyboard/KeyCap.svelte)
 // ====================================================
 
 export function handleKeydown(e: KeyboardEvent, engine: KeyboardEngine, audio: AudioEngine) {
-    let k = e.key.toLowerCase();
+    let k = getBaseKey(e.key.toLowerCase());
     // console.log(e.location);
     if (!excludedKeys.has(k)) e.preventDefault();
 
@@ -63,7 +73,7 @@ export function handleKeydown(e: KeyboardEvent, engine: KeyboardEngine, audio: A
 }
 
 export function handleKeyup(e: KeyboardEvent, engine: KeyboardEngine, audio: AudioEngine) {
-    let k = e.key.toLowerCase(); // PREVENTS "W" and "w" from both being in the keypress set, for example  
+    let k = getBaseKey(e.key.toLowerCase()); // PREVENTS "W" and "w" from both being in the keypress set, for example  
     e.preventDefault(); // is this even needed?
 
     const type: string = classifyKey(k, false);

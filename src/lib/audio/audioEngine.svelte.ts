@@ -1,18 +1,78 @@
+import * as Tone from 'tone';
 import { log } from "$lib/utils/logging";
+import { instrRegistry } from './instrRegistry';
+import { buildSampler, buildSynth } from './instrLoader';
+import { browser } from '$app/environment';
+
 
 export function createAudioEngine() {
+    function ensureVolumeNode() {
+        if (!browser) return null;
+        if (!volumeNode) {
+            volumeNode = new Tone.Volume(Tone.gainToDb(audioState.volumePercent / 100)).toDestination();
+        }
+        return volumeNode;
+    }
+
+    const audioState = $state({
+        currentInstrumentID: "",
+        isLoading: false,
+        volumePercent: 100,
+    })
+
+    let volumeNode: Tone.Volume | null = null;
+    let effectNode: Tone.ToneAudioNode | null = null;
+    let instrumentNode: Tone.Sampler | Tone.PolySynth | null = null;
+    const instrumentCache = new Map<string, Tone.Sampler | Tone.PolySynth>();
+
+    function wireChain() {
+        if (!browser || !instrumentNode) return;
+        const vol = ensureVolumeNode()!;
+        instrumentNode.disconnect();
+        if (effectNode) {
+            instrumentNode.connect(effectNode);
+            effectNode.connect(vol);
+        } else {
+            instrumentNode.connect(vol);
+        }
+    }
+
+    async function loadInstrument(id: string) {
+        audioState.isLoading = true;
+        let node = instrumentCache.get(id);
+        if (!node) {
+            const meta = instrRegistry.find(i => i.id === id)!;
+            node = meta.kind === 'sampler' ? await buildSampler(id) : buildSynth(meta.synthType!);
+            instrumentCache.set(id, node);
+        }
+        instrumentNode = node;
+        wireChain();
+        audioState.currentInstrumentID = id;
+        audioState.isLoading = false;
+    }
+
     function play(midi: number) {
-        // TODO
+        // audioState.currentInstrument.triggerAttack(Tone.Frequency(midiNote, "midi"),Tone.getContext().currentTime);   
+        instrumentNode?.triggerAttack(Tone.Frequency(midi, 'midi').toFrequency(), Tone.getContext().currentTime);
         log(`[AUDIO] played midi note: ${midi}`);
-     }
+    }
     function release(midi: number) {
-        // TODO
+        instrumentNode?.triggerRelease(midi, Tone.getContext().currentTime);
         log(`[AUDIO] released midi note: ${midi}`);
     }
-    function setInstrument(inst: string) {
-        // TODO
+
+    function setVolumePercent(n: number) {
+        if (!volumeNode) return;
+        audioState.volumePercent = n;
+        volumeNode.volume.value = Tone.gainToDb(n / 100);
     }
-    return { play, release, setInstrument };
+
+    
+    return {
+        get isLoading() { return audioState.isLoading; },
+        get currentInstrumentId() { return audioState.currentInstrumentID; },
+        loadInstrument, setVolumePercent, play, release,
+    };
   }
 
   export type AudioEngine = ReturnType<typeof createAudioEngine>;
