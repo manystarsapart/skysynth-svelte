@@ -15,7 +15,5 @@ onMount(() => { audio.loadInstrument('piano'); });
   onkeyup={(e) => handleKeyup(e, engine, audio)}
 />
 
-<p>hi</p>
-
 <!-- <KeyboardHalf side="left" {engine} {audio} />
 <KeyboardHalf side="right" {engine} {audio} /> -->
