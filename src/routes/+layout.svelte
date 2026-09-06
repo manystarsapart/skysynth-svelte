@@ -1,8 +1,7 @@
 <script lang="ts">
 
-	import './layout.css'; // im not sure whats here
+	import './layout.css'; // tailwind
 	import thumbnail from '$lib/assets/thumbnail.jpeg';
-	import '../app.css'; // tailwind
 
 
 	let { children } = $props();

@@ -7,7 +7,7 @@ import { leftKeyboardKeys, pitchMap, rightKeyboardKeys } from "./maps"
 // KEY CONFIGS
 // ====================================================
 
-export const excludedKeys = new Set<string>(["control", "r"]);
+export const excludedKeys = new Set<string>(["control"]);
 const modifierKeys = new Set([" ", "enter"]);
 const tempModifierKeys = new Set(["alt", "shift"]);
 const menuKeys = new Set(["escape", "backspace", "tab", "delete", "\\"]);
@@ -63,9 +63,7 @@ export function handleKeydown(e: KeyboardEvent, engine: KeyboardEngine, audio: A
             break;
         case "menu":
             // menu key
-            // TODO
-            // TODO
-            // TODO
+            engine.resolveMenu(trackedKey);
             break;
     } 
 
@@ -80,7 +78,8 @@ export function handleKeyup(e: KeyboardEvent, engine: KeyboardEngine, audio: Aud
 
     if (type === 'note') {
         const midi = engine.noteUp(k);
-        if (midi !== null) audio.release(midi);
+        // if (midi !== null && engine.getSAWR == true) audio.release(midi);
+        if (midi !== null && engine.getSAWR == true) audio.releaseAfter(midi, engine.sawrDelay);
         return;
     }
 

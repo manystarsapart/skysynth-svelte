@@ -21,11 +21,13 @@
     }
 </script>
   
-  <!-- <div
-    class="keyboard-key ..."
-    class:key-active={engine.pressedKeys.has(keyId)}
-    onpointerdown={down}
-    onpointerup={up}
-  >
-    {keyId.toUpperCase()}
-  </div> -->
+<button 
+    // role="button"
+  class="keyboard-key ..."
+  class:key-active={engine.pressedKeys.has(keyId)}
+  onpointerdown={down}
+  onpointerup={up}
+>
+  {keyId.toUpperCase()}
+</button>
+

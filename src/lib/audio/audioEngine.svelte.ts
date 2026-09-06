@@ -56,9 +56,16 @@ export function createAudioEngine() {
         instrumentNode?.triggerAttack(Tone.Frequency(midi, 'midi').toFrequency(), Tone.getContext().currentTime);
         log(`[AUDIO] played midi note: ${midi}`);
     }
+
     function release(midi: number) {
-        instrumentNode?.triggerRelease(midi, Tone.getContext().currentTime);
+        instrumentNode?.triggerRelease(Tone.Frequency(midi, 'midi').toFrequency(), Tone.getContext().currentTime);
         log(`[AUDIO] released midi note: ${midi}`);
+    }
+
+    function releaseAfter(midi: number, delayMs: number = 0) {
+        const releaseTime = Tone.getContext().currentTime + (delayMs / 1000);
+        instrumentNode?.triggerRelease(Tone.Frequency(midi, "midi").toFrequency(), releaseTime);
+        log(`[AUDIO] released (with SAWR) midi note: ${midi} after delay (${delayMs} ms)`)
     }
 
     function setVolumePercent(n: number) {
@@ -71,7 +78,7 @@ export function createAudioEngine() {
     return {
         get isLoading() { return audioState.isLoading; },
         get currentInstrumentId() { return audioState.currentInstrumentID; },
-        loadInstrument, setVolumePercent, play, release,
+        loadInstrument, setVolumePercent, play, release, releaseAfter,
     };
   }
 

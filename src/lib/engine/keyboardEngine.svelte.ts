@@ -31,6 +31,8 @@ export function createKeyboardEngine() {
         transposeValue: 0,
         octave: 0,
         currentKeyboardMode: 0,
+        sawrEnabled: false, // stop audio when released
+        sawrDelay: 50,
     });
 
     const pressedKeys = new SvelteSet<string>(); // includes ALL keys
@@ -131,6 +133,14 @@ export function createKeyboardEngine() {
         log(`Octaved to ${state.octave}`);
     }
 
+    function toggleSAWR(target?: boolean) {
+        state.sawrEnabled = (target) ? target : !state.sawrEnabled; 
+    }
+    function setSAWRDelay(target: number) {
+        state.sawrDelay = clamp(target, 0, 100);
+        log(`Set SAWR delay to ${state.sawrDelay}`);
+    }
+
     function resolveTrOC(k: string) {
         switch (k) {
             case "[":
@@ -150,6 +160,15 @@ export function createKeyboardEngine() {
         }
     }
 
+    function resolveMenu(k: string) {
+        switch (k) {
+            case "\\": // toggle SAWR
+                toggleSAWR();
+                break;
+            // TODO THE REST
+        }
+    }
+
     // ========================
     // RESET
     // ========================
@@ -158,6 +177,13 @@ export function createKeyboardEngine() {
         state.transposeValue = 0;
         state.octave = 0;
         state.currentKeyboardMode = 0;
+        state.sawrEnabled = false;
+        state.sawrDelay = 0;
+        pressedKeys.clear();
+        heldNotes.clear();
+    }
+
+    function resetKeys() {
         pressedKeys.clear();
         heldNotes.clear();
     }
@@ -170,15 +196,17 @@ export function createKeyboardEngine() {
         get currentKeyboardMode() { return state.currentKeyboardMode; },
         get transposeValue() { return state.transposeValue; },
         get octave() { return state.octave; },
+        get getSAWR() { return state.sawrEnabled; },
+        get sawrDelay() { return state.sawrDelay; },
         get pressedKeys(): ReadonlySet<string> { return pressedKeys; }, // UI indicator later......
         isDown, markDown, markUp,
         noteDown, noteUp,
-        resolveTrOC,
+        resolveTrOC, resolveMenu,
         transposeBy, transposeTo,
         octaveBy, octaveTo,
+        toggleSAWR, setSAWRDelay,
         setKeyboardMode,
-        reset,
-
+        reset, resetKeys,
     }
 }
 
