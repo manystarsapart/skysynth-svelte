@@ -5,6 +5,10 @@
 import { log } from "$lib/utils/logging";
 import { SvelteSet } from "svelte/reactivity";
 import { keyboardMode0, keyboardMode1, keyboardMode2, leftKeyboardKeys, rightKeyboardKeys, type KeyboardModeType } from "./maps";
+import { toggleSettingsOpen } from "$lib/visual/menu.svelte";
+import { DEFAULT_KEYBOARD, type KeyboardSettings } from "$lib/settings/schema";
+import { browser } from "$app/env";
+import { debounce, loadFromStorage, saveToStorage } from "$lib/settings/storage";
 
 export const skyStates = $state({
     // VERSIONING
@@ -167,6 +171,8 @@ export function createKeyboardEngine() {
                 toggleSAWR();
                 break;
             // TODO THE REST
+            case "escape": // toggle settings panel
+                toggleSettingsOpen();
         }
     }
 
@@ -190,8 +196,50 @@ export function createKeyboardEngine() {
     }
 
     // ========================
+    // SETTINGS
+    // ========================
+
+
+    function getSettingsSnapshot(): KeyboardSettings {
+        return {
+            transposeValue: state.transposeValue,
+            octave: state.octave,
+            currentKeyboardMode: state.currentKeyboardMode,
+            sawrEnabled: state.sawrEnabled,
+            sawrDelay: state.sawrDelay,
+        };
+    }
+
+    function applySettings(s: Partial<KeyboardSettings>) {
+        if (s.transposeValue !== undefined) state.transposeValue = s.transposeValue;
+        if (s.octave !== undefined) state.octave = s.octave;
+        if (s.currentKeyboardMode !== undefined) state.currentKeyboardMode = s.currentKeyboardMode;
+        if (s.sawrEnabled !== undefined) state.sawrEnabled = s.sawrEnabled;
+        if (s.sawrDelay !== undefined) state.sawrDelay = s.sawrDelay;
+    }
+    
+    function resetToDefaults() {
+        applySettings(DEFAULT_KEYBOARD);
+    }
+    
+    if (browser) {
+        const saved = loadFromStorage<KeyboardSettings>('keyboard');
+        if (saved) applySettings(saved);
+    
+        const persist = debounce(() => saveToStorage('keyboard', getSettingsSnapshot()), 300);
+        $effect.root(() => {
+            $effect(() => {
+                void [state.transposeValue, state.octave, state.currentKeyboardMode, state.sawrEnabled, state.sawrDelay];
+                persist();
+            });
+        });
+    }
+
+    // ========================
     // EXPOSING EVERYTHING
     // ========================
+
+    log(`[KEYBOARD] Keyboard engine created.`);
 
     return {
         get currentKeyboardMode() { return state.currentKeyboardMode; },
@@ -208,6 +256,7 @@ export function createKeyboardEngine() {
         toggleSAWR, setSAWRDelay,
         setKeyboardMode,
         reset, resetKeys,
+        getSettingsSnapshot, applySettings, resetToDefaults,
     }
 }
 

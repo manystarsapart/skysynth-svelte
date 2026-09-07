@@ -1,7 +1,7 @@
 <script lang="ts">
     import type { KeyboardEngine } from '$lib/engine/keyboardEngine.svelte';
     import type { AudioEngine } from '$lib/audio/audioEngine.svelte';
-    // import { visualStates } from '$lib/visual/menu.svelte';e
+    import { visualStates } from '$lib/visual/menu.svelte';
   import { onDestroy, onMount } from 'svelte';
   import { playNoteDownAnimation, playNoteUpAnimation, registerKeyElement, unregisterKeyElement } from '$lib/visual/keyAnimations';
   
@@ -25,7 +25,8 @@
         e.preventDefault();
         const midi = engine.noteUp(keyId);
         if (midi === null) return;
-        audio.release(midi);
+        // audio.release(midi);
+        if (midi !== null && engine.getSAWR == true) audio.releaseAfter(midi, engine.sawrDelay);
         playNoteUpAnimation(keyId, engine.getSAWR);
     }
 
@@ -43,6 +44,7 @@
     class="keyboard-key ..."
     class:key-active={engine.pressedKeys.has(keyId)}
     style:transition={engine.getSAWR ? "none" : "0.3s ease-out"}
+    style:width="{visualStates.notesSizePercent * 6 / 100}rem"
     onpointerdown={down}
     onpointerup={up}
 >
@@ -53,7 +55,7 @@
     .keyboard-key {
         /* outline: red solid 1px; */
         border-radius: 1rem; /* TODO: MAKE THIS CUSTOMISABLE */
-        width: 6rem; /* TODO: MAKE THIS CUSTOMISABLE */
+        /* width: 6rem; TODO: MAKE THIS CUSTOMISABLE */
         aspect-ratio: 1 / 1 !important;
         display: flex;
         align-items: center;

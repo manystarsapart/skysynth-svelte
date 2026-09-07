@@ -1,6 +1,8 @@
 <script lang="ts">
 import { createAudioEngine } from "$lib/audio/audioEngine.svelte";
 import { listAvailableInstrumentIds } from "$lib/audio/instrAssets";
+  // import Menu from "$lib/components/controls/SettingsPanel.svelte";
+  import SettingsWrapper from "$lib/components/controls/SettingsWrapper.svelte";
 import KeyboardHalf from "$lib/components/keyboard/KeyboardHalf.svelte";
 import { createKeyboardEngine } from "$lib/engine/keyboardEngine.svelte";
 import { handleKeydown, handleKeyup } from "$lib/engine/keyHandler";
@@ -49,13 +51,12 @@ let instrStr = $derived(String(instr).replace(/\b,\b/g,"<br>"));
     }
   }}
 />
-<div class="text-center text-3xl">
-  <p>TRANSPOSE: {currentTranspose}</p>
-  <p>OCTAVE: {currentOctave}</p>
-  <p>Instrument sustain: {currentSustain}</p>
-  <p>Stop Audio When Released: {currentSAWR}{(currentSAWR) ? `; Delay: ${currentSAWRDelay}` : ``}</p>
+<div class="text-center text-xl">
+  <p>TRANSPOSE: {currentTranspose} / OCTAVE: {currentOctave} / Sustain: {currentSustain} / SAWR: {currentSAWR}{(currentSAWR) ? `; Delay: ${currentSAWRDelay}` : ``}</p>
   <!-- <p>{keys}</p> -->
 </div>
+
+<SettingsWrapper {engine} {audio}/>
 
 <div class="flex text-center justify-evenly text-4xl"
   style:padding-top="{visualStates.keyboardPosition}rem"
@@ -67,6 +68,6 @@ let instrStr = $derived(String(instr).replace(/\b,\b/g,"<br>"));
 <br>
 
 <!-- {@html instrStr} -->
- 
+
 <!-- {keysArr} -->
 

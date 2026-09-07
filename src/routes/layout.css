@@ -1,9 +1,6 @@
 @import 'tailwindcss';
 
 html, body {
-    background-color: rgba(0,0,0,0.85);
-    color: gainsboro;
-
     /* PREVENT USER GESTURES */
     overscroll-behavior: none;
     touch-action: none;
@@ -11,6 +8,11 @@ html, body {
     user-select: none;
     -webkit-touch-callout: none;
     -webkit-tap-highlight-color: transparent;
+}
+
+html {
+    background-color: rgba(0,0,0,0.85);
+    color: gainsboro;
 }
 
 img, .character-image {
@@ -25,3 +27,7 @@ img, .character-image {
     -webkit-user-select: auto;
     user-select: auto;
 }
+
+/* for settings panel */
+.scrollbar-hide::-webkit-scrollbar { display: none; }
+.scrollbar-hide { scrollbar-width: none; -ms-overflow-style: none; }

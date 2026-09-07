@@ -3,9 +3,16 @@ import { log } from "$lib/utils/logging";
 import { instrRegistry } from './instrRegistry';
 import { buildSampler, buildSynth } from './instrLoader';
 import { browser } from '$app/environment';
+import { DEFAULT_AUDIO, type AudioSettings } from '$lib/settings/schema';
+import { debounce, loadFromStorage, saveToStorage } from '$lib/settings/storage';
 
 
 export function createAudioEngine() {
+
+    // ========================
+    // INIT
+    // ========================
+
     function ensureVolumeNode() {
         if (!browser) return null;
         if (!volumeNode) {
@@ -17,7 +24,7 @@ export function createAudioEngine() {
     const audioState = $state({
         currentInstrumentID: "",
         isLoading: false,
-        volumePercent: 100,
+        volumePercent: 80,
         currentSustain: false,
         currentDelay: 50,
     })
@@ -26,6 +33,10 @@ export function createAudioEngine() {
     let effectNode: Tone.ToneAudioNode | null = null;
     let instrumentNode: Tone.Sampler | Tone.PolySynth | null = null;
     const instrumentCache = new Map<string, Tone.Sampler | Tone.PolySynth>();
+
+    // ========================
+    // HOOKING AUDIO
+    // ========================
 
     function wireChain() {
         if (!browser || !instrumentNode) return;
@@ -38,6 +49,10 @@ export function createAudioEngine() {
             instrumentNode.connect(vol);
         }
     }
+
+    // ========================
+    // INSTRUMENT
+    // ========================
 
     async function loadInstrument(id: string = "piano") {
         audioState.isLoading = true;
@@ -75,22 +90,60 @@ export function createAudioEngine() {
     }
 
     function setVolumePercent(n: number) {
-        if (!volumeNode) return;
+        const vol = ensureVolumeNode();
+        if (!vol) return;
         audioState.volumePercent = n;
-        volumeNode.volume.value = Tone.gainToDb(n / 100);
+        vol.volume.value = Tone.gainToDb(n / 100);
     }
 
-    log(`[AUDIO] Audio engine created.`);
+    // ========================
+    // SETTINGS
+    // ========================
+
+    function getSettingsSnapshot(): AudioSettings {
+        return {
+            instrumentId: audioState.currentInstrumentID,
+            volumePercent: audioState.volumePercent,
+        };
+    }
     
+    function applySettings(s: Partial<AudioSettings>) {
+        if (s.instrumentId) loadInstrument(s.instrumentId); 
+        if (s.volumePercent !== undefined) setVolumePercent(s.volumePercent);
+    }
+    
+    function resetToDefaults() {
+        applySettings(DEFAULT_AUDIO);
+    }
+    
+    if (browser) {
+        const saved = loadFromStorage<AudioSettings>('audio');
+        if (saved) applySettings(saved);
+    
+        const persist = debounce(() => saveToStorage('audio', getSettingsSnapshot()), 300);
+        $effect.root(() => {
+            $effect(() => {
+                void [audioState.currentInstrumentID, audioState.volumePercent];
+                persist();
+            });
+        });
+    }
+
+    // ========================
+    // EXPOSING EVERYTHING
+    // ========================
+    log(`[AUDIO] Audio engine created.`);
+
     return {
         get isLoading() { return audioState.isLoading; },
         get isSustain() { return audioState.currentSustain; },
         get currentSAWRDelay() { return audioState.currentDelay},
         get currentInstrumentId() { return audioState.currentInstrumentID; },
-        get volume() { return audioState.volumePercent; },
+        get volumePercent() { return audioState.volumePercent; },
         
         loadInstrument, setVolumePercent, play, release, releaseAfter,
+        getSettingsSnapshot, applySettings, resetToDefaults,
     };
-  }
+}
 
   export type AudioEngine = ReturnType<typeof createAudioEngine>;
