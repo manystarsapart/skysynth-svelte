@@ -134,10 +134,11 @@ export function createKeyboardEngine() {
     }
 
     function toggleSAWR(target?: boolean) {
-        state.sawrEnabled = (target) ? target : !state.sawrEnabled; 
+        state.sawrEnabled = (target !== undefined) ? target : !state.sawrEnabled; 
     }
     function setSAWRDelay(target: number) {
-        state.sawrDelay = clamp(target, 0, 100);
+        // state.sawrDelay = clamp(target, 0, 100);
+        state.sawrDelay = target;
         log(`Set SAWR delay to ${state.sawrDelay}`);
     }
 
