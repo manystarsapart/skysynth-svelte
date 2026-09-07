@@ -1,5 +1,6 @@
 import type { AudioEngine } from "$lib/audio/audioEngine.svelte";
 import { log } from "$lib/utils/logging";
+import { playNoteDownAnimation, playNoteUpAnimation } from "$lib/visual/keyAnimations";
 import { type KeyboardEngine } from "./keyboardEngine.svelte";
 import { leftKeyboardKeys, pitchMap, rightKeyboardKeys } from "./maps"
 
@@ -42,7 +43,11 @@ export function handleKeydown(e: KeyboardEvent, engine: KeyboardEngine, audio: A
 
     if (type === 'note') {
         const midi = engine.noteDown(trackedKey);
-        if (midi !== null) audio.play(midi); // TODO: AUDIO ENGINE
+        if (midi !== null) {
+            audio.play(midi);
+            playNoteDownAnimation(trackedKey, engine.getSAWR);
+        };
+
         return;
     }
 
@@ -80,6 +85,7 @@ export function handleKeyup(e: KeyboardEvent, engine: KeyboardEngine, audio: Aud
         const midi = engine.noteUp(k);
         // if (midi !== null && engine.getSAWR == true) audio.release(midi);
         if (midi !== null && engine.getSAWR == true) audio.releaseAfter(midi, engine.sawrDelay);
+        playNoteUpAnimation(k, engine.getSAWR);
         return;
     }
 

@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { AudioEngine } from "$lib/audio/audioEngine.svelte";
   import type { KeyboardEngine } from "$lib/engine/keyboardEngine.svelte";
-  import { leftKeyRows, rightKeyRows } from "$lib/engine/maps";
+  import { keySvgPattern, leftKeyRows, rightKeyRows } from "$lib/engine/maps";
   import { visualStates } from "$lib/visual/menu.svelte";
   import KeyCap from "./KeyCap.svelte";
 
@@ -17,12 +17,13 @@
 <div class="keyboard-half"
   style:gap="{visualStates.noteSpacingH}rem"
 >
-  {#each rows as row}
-    <div class="key-row"
+  {#each rows as row, rowIndex}
+    <div 
+      class="key-row"
       style:gap="{visualStates.noteSpacingV}rem"
     >
-      {#each row as keyId (keyId)}
-        <KeyCap {keyId} {engine} {audio} />
+      {#each row as keyId, colIndex (keyId)}
+        <KeyCap {keyId} {engine} {audio} svgPattern={keySvgPattern[rowIndex][colIndex]}/>
       {/each}
     </div>
   {/each}
@@ -32,14 +33,10 @@
 <style>
   .keyboard-half {
     display: grid;
-    grid-template-rows: repeat(3, 1fr); /* 3 rows */
-    /* H */
-    /* gap: 0.5rem */
+    grid-template-rows: repeat(3, 1fr); /* 3 ROWS */
   }
   .key-row {
     display: grid;
-    grid-template-columns: repeat(5, 1fr); /* 5 cols */
-    /* V */
-    /* gap: 0.5rem; */
+    grid-template-columns: repeat(5, 1fr); /* 5 COLS */
   }
 </style>

@@ -15,7 +15,7 @@ export interface InstrumentMeta {
     { id: 'bugle', displayName: 'Bugle', spriteCount: 7, kind: 'sampler', sustain: false },
     { id: 'eguitar', displayName: 'E-Guitar', spriteCount: 5,  kind: 'sampler', sustain: true, recSAWRdelay: 50 },
     { id: 'flute', displayName: 'Flute', spriteCount: 5, kind: 'sampler', sustain: false },
-    { id: 'grandpiano', displayName: 'Grand Piano', spriteCount: 0, kind: 'sampler', sustain: false }, // default sprite
+    { id: 'grandpiano', displayName: 'Grand Piano', spriteCount: 0, kind: 'sampler', sustain: false, recSAWRdelay: 50 }, // default sprite
     { id: 'guitar', displayName: 'Guitar', spriteCount: 5, kind: 'sampler', sustain: false },
     { id: 'harmonica_long', displayName: 'Harmonica (Long)', spriteCount: 0, kind: 'sampler', sustain: true, recSAWRdelay: 50 }, // default sprite
     { id: 'harmonica_short', displayName: 'Harmonica (Short)', spriteCount: 0, kind: 'sampler', sustain: false }, // default sprite
@@ -25,6 +25,7 @@ export interface InstrumentMeta {
     { id: 'musicbox', displayName: 'Music Box', spriteCount: 0, kind: 'sampler', sustain: false }, // default sprite
     { id: 'panflute', displayName: 'Panflute', spriteCount: 0, kind: 'sampler', sustain: false }, // default sprite
     
+    // TODO MORE
     
 
     { id: 'piano', displayName: 'Piano', spriteCount: 10, kind: 'sampler', sustain: false },

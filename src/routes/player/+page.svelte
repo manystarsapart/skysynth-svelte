@@ -12,7 +12,7 @@ const engine = createKeyboardEngine();
 const audio = createAudioEngine();
 
 onMount(async () => { // THIS IS ASYNC SO INSTRUMENT LOADS BEFORE WE DEAL WITH THE STATES!!!
-  await audio.loadInstrument('grandpiano');
+  await audio.loadInstrument('piano');
   log("[PLAYER] Sustain: " + String(audio.isSustain));
   engine.toggleSAWR(audio.isSustain);
   engine.setSAWRDelay(audio.currentSAWRDelay);
@@ -66,6 +66,7 @@ let instrStr = $derived(String(instr).replace(/\b,\b/g,"<br>"));
 </div>
 <br>
 
-{@html instrStr}
- <!-- {keysArr} -->
+<!-- {@html instrStr} -->
+ 
+<!-- {keysArr} -->
 

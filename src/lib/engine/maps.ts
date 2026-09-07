@@ -104,3 +104,9 @@ export const rightKeyRows: string[][] = [
     ['h', 'j', 'k', 'l', ';'],
     ['n', 'm', ',', '.', '/'],
 ];
+
+export const keySvgPattern: number[][] = [
+    [1, 2, 3, 2, 3],
+    [3, 2, 1, 2, 3],
+    [3, 2, 3, 2, 1],
+];
