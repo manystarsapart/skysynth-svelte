@@ -1,4 +1,5 @@
 import type { AudioEngine } from "$lib/audio/audioEngine.svelte";
+import { loadPresetForKey } from "$lib/settings/presets.svelte";
 import { log } from "$lib/utils/logging";
 import { playNoteDownAnimation, playNoteUpAnimation } from "$lib/visual/keyAnimations";
 import { type KeyboardEngine } from "./keyboardEngine.svelte";
@@ -33,9 +34,12 @@ export function handleKeydown(e: KeyboardEvent, engine: KeyboardEngine, audio: A
     // console.log(e.location);
     if (!excludedKeys.has(k)) e.preventDefault();
 
-    const type: string = classifyKey(k, true);
+    let type: string = classifyKey(k, true);
 
     const trackedKey = (type === 'tmod') ? `${k}${e.location === 1 ? 'L' : 'R'}` : k; // CATCHES TMOD & ADDS LOC EARLY
+
+    const altHeld = engine.isDown('altL') || engine.isDown('altR');
+    if (type === 'tran' && altHeld) type = 'preset'; // CHANGES NUMBER KEY TO TYPE PRESET IF ALT IS HELD. CHECK $lib/settings/presets.svelte.ts
     
     // removing repeat keys from holding
     if (engine.isDown(trackedKey)) return;   
@@ -62,6 +66,9 @@ export function handleKeydown(e: KeyboardEvent, engine: KeyboardEngine, audio: A
             // transpose key
             engine.transposeTo(pitchMap[trackedKey]);
             break;
+        case "preset": 
+            loadPresetForKey(trackedKey, engine, audio); 
+            break;
         case "troc":
             // +1 / -1 transpose & octave key
             engine.resolveTrOC(trackedKey);
@@ -72,6 +79,8 @@ export function handleKeydown(e: KeyboardEvent, engine: KeyboardEngine, audio: A
             break;
     } 
 
+
+    
     log(`[HANDLEKEYDOWN] ${trackedKey} --> [${type}] down`);
 }
 

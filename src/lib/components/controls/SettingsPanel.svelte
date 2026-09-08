@@ -1,7 +1,7 @@
 <script lang="ts">
 import type { AudioEngine } from "$lib/audio/audioEngine.svelte";
 import type { KeyboardEngine } from "$lib/engine/keyboardEngine.svelte";
-import { resetVisualDefaults, visualStates } from "$lib/visual/menu.svelte";
+import { getVisualSettingsSnapshot, resetVisualDefaults, visualStates } from "$lib/visual/menu.svelte";
 import { slide } from "svelte/transition";
 import LabelledSlider from "./LabelledSlider.svelte";
 import ToggleSwitch from "./ToggleSwitch.svelte";
@@ -12,6 +12,9 @@ import Stepper from "./Stepper.svelte";
 import { transposeMap } from "$lib/engine/maps";
 import { SETTINGS_FILE_EXT, SETTINGS_VERSION, type SkySettingsFile } from "$lib/settings/schema";
 import { getFormattedDateTimeForDownload } from "$lib/utils/helpers";
+import { assignPreset, clearPreset, presetState, renamePreset } from "$lib/settings/presets.svelte";
+import { applySettingsFile, buildSettingsFile } from "$lib/settings/apply";
+import { log } from "$lib/utils/logging";
 
 // ========================
 // INIT
@@ -22,23 +25,17 @@ let { engine, audio }: {
     audio: AudioEngine;
 } = $props();
 
-let visual = $derived(visualStates);
+// ========================
+// IMPORT / EXPORT
+// ========================
+
 let fileInput: HTMLInputElement;
-    
-    
-// ========================
-// EXPORT
-// ========================
+let pendingSlotIndex: number | null = null; 
+// null = normal import
+// else = target preset slot
+
 function exportSettings() {
-    const payload: SkySettingsFile = {
-        app: 'skysynth',
-        type: 'settings',
-        version: SETTINGS_VERSION,
-        exportedAt: new Date().toISOString(),
-        visual: { ...visualStates },
-        keyboard: engine.getSettingsSnapshot(),
-        audio: audio.getSettingsSnapshot(),
-    };
+    const payload = buildSettingsFile(engine, audio);
     const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -48,50 +45,94 @@ function exportSettings() {
     URL.revokeObjectURL(url);
 }
 
-// ========================
-// IMPORT
-// ========================
-
 function triggerImport() {
-        fileInput.click();
-    }
+    pendingSlotIndex = null;
+    fileInput.click();
+}
 
-    async function handleImportFile(e: Event) {
-        const input = e.target as HTMLInputElement;
-        const file = input.files?.[0];
-        input.value = ''; // allow re-selecting the same file later
-        if (!file) return;
+function triggerImportToSlot(index: number) {
+    pendingSlotIndex = index;
+    fileInput.click();
+}
 
-        try {
-            const text = await file.text();
-            const parsed = JSON.parse(text) as Partial<SkySettingsFile>;
+async function handleImportFile(e: Event) {
+    const input = e.target as HTMLInputElement;
+    const file = input.files?.[0];
+    const slotIndex = pendingSlotIndex; // capture before its reset
+    pendingSlotIndex = null;
+    input.value = ''; // allow re-selecting the same file later
 
-            if (parsed.app !== 'skysynth' || parsed.type !== 'settings') {
-                alert('Not a valid SkySynth settings file.');
-                return;
-            }
-            if (parsed.version !== undefined && parsed.version > SETTINGS_VERSION) {
-                // shouldnt happen
-                alert('This settings file was made by a newer version of SkySynth.');
-                return;
-            }
+    if (!file) return;
 
-            if (parsed.visual) Object.assign(visualStates, parsed.visual);
-            if (parsed.keyboard) engine.applySettings(parsed.keyboard);
-            if (parsed.audio) audio.applySettings(parsed.audio);
-        } catch {
-            alert('Could not read that file — it may be corrupted or not a settings file.');
+    try {
+        const text = await file.text();
+        const parsed = JSON.parse(text) as Partial<SkySettingsFile>;
+
+        if (parsed.app !== 'skysynth' || parsed.type !== 'settings') {
+            alert('Not a valid SkySynth settings file.');
+            return;
         }
+        if (parsed.version !== undefined && parsed.version > SETTINGS_VERSION) {
+            alert('This settings file was made by a newer version of SkySynth.');
+            return;
+        }
+
+        if (slotIndex !== null) { // GOING INTO PRESETS
+            const label = prompt('Name this preset (optional):', `Preset ${slotIndex}`) ?? '';
+            assignPreset(slotIndex, parsed as SkySettingsFile, label);
+        } else { // LIVE IMPORT (NOT PRESET)
+            await applySettingsFile(parsed as SkySettingsFile, engine, audio);
+        }
+    } catch {
+        alert('Could not read that file — it may be corrupted or not a settings file.');
     }
+}
+
+// null-safe wrapper
+function loadSlot(file: SkySettingsFile | null) {
+    if (!file) return;
+    applySettingsFile(file, engine, audio);
+}
+
+
+function renameLabel(slot: { index: number; file: SkySettingsFile | null; label: string }) {
+    const newLabel = prompt('Name this preset', slot.label) ?? slot.label;
+    renamePreset(slot.index, newLabel);
+    log(`[PRESET] Renamed slot ${slot.index} to ${newLabel}.`);
+}
+
+// ========================
+// RESET
+// ========================
+
+function resetAll() {
+    if (!confirm('Reset ALL settings (audio, keyboard, visual) to defaults? This cannot be undone.')) return;
+    audio.resetToDefaults();
+    engine.resetToDefaults();
+    resetVisualDefaults();
+}
+
 
 </script>
 <div class="sticky top-0 z-10 bg-gray-900/95 backdrop-blur
     border-b border-gray-800 px-5 py-3">
     <div class="flex items-center justify-between">
         <h2 class="text-base font-semibold">Settings</h2>
+        <div class="sticky top-0 z-10 bg-gray-900/95 backdrop-blur border-b border-gray-800 px-5 py-3">
+            <div class="flex items-center justify-between">
+                <h2 class="text-base font-semibold">Settings</h2>
+                <div class="flex items-center gap-2">
+                    <button
+                        type="button"
+                        onclick={resetAll}
+                        class="text-xs px-3 py-2 rounded-lg bg-gray-800 opacity-80 hover:opacity-100"
+                    >Reset all</button>
+                </div>
+            </div>
+        </div>
         <button
             type="button"
-            onclick={() => visual.settingsOpen = false}
+            onclick={() => visualStates.settingsOpen = false}
             class="h-11 w-11 rounded-xl bg-gray-800
                 flex items-center justify-center"
             aria-label="Close settings"
@@ -102,7 +143,7 @@ function triggerImport() {
 </div>
 
 
-<!-- IMPORT / EXPORT  -->
+<!-- LIVE IMPORT / EXPORT  -->
 <section class="rounded-2xl bg-gray-800/40 p-4 space-y-4">
     <div class="flex items-center justify-between">
         <h3 class="text-xs uppercase tracking-wide opacity-50">IMPORT / EXPORT</h3>
@@ -121,6 +162,47 @@ function triggerImport() {
             class="flex-1 h-10 rounded-lg bg-gray-700 text-sm">Export settings</button>
         <button type="button" onclick={triggerImport}
             class="flex-1 h-10 rounded-lg bg-gray-700 text-sm">Import settings</button>
+    </div>
+</section>
+
+<!-- PRESET -->
+<input
+    bind:this={fileInput}
+    type="file"
+    accept="{SETTINGS_FILE_EXT},application/json"
+    class="hidden"
+    onchange={handleImportFile}
+/>
+
+<section class="rounded-2xl bg-gray-800/40 p-4 space-y-4">
+    <div class="flex items-center justify-between">
+        <h3 class="text-xs uppercase tracking-wide opacity-50">Presets (Alt + number)</h3>
+    </div>
+    <div class="grid grid-cols-3 gap-2">
+        {#each presetState.slots as slot (slot.index)}
+            <div class="rounded-lg bg-gray-700 p-2 flex flex-col gap-1">
+                <span class="text-xs opacity-70">Alt+{slot.index}</span>
+                {#if slot.file}
+                    <div class="flex justify-around">
+                        <span class="text-sm truncate">{slot.label || `Preset ${slot.index}`}</span>
+                        <button onclick={() => renameLabel(slot)}>✎</button>
+                        
+                    </div>
+                    
+                    <div class="flex gap-1">
+                        <button onclick={() => loadSlot(slot.file)}
+                            class="flex-1 text-xs rounded bg-teal-600 py-1">Load</button>
+                        <button onclick={() => clearPreset(slot.index)}
+                            class="text-xs rounded bg-gray-600 px-2">✕</button>
+                    </div>
+                {:else}
+                    <button onclick={() => assignPreset(slot.index, buildSettingsFile(engine, audio))}
+                        class="text-xs rounded bg-gray-600 py-1">Save current</button>
+                    <button onclick={() => triggerImportToSlot(slot.index)}
+                        class="text-xs rounded bg-gray-600 py-1">Upload file</button>
+                {/if}
+            </div>
+        {/each}
     </div>
 </section>
 
@@ -224,27 +306,27 @@ function triggerImport() {
             class="text-xs px-2 py-1 rounded bg-gray-800 opacity-70">Reset</button>
     </div>
 
-    <LabelledSlider label="Character size [TODO]" value={visual.charSpriteSizePercent}
-        min={10} max={100} unit="%" onInput={(v) => visual.charSpriteSizePercent = v} />
+    <LabelledSlider label="Character size [TODO]" value={visualStates.charSpriteSizePercent}
+        min={10} max={100} unit="%" onInput={(v) => visualStates.charSpriteSizePercent = v} />
 
-    <LabelledSlider label="Note size" value={visual.notesSizePercent}
-        min={30} max={200} unit="%" onInput={(v) => visual.notesSizePercent = v} />
+    <LabelledSlider label="Note size" value={visualStates.notesSizePercent}
+        min={30} max={200} unit="%" onInput={(v) => visualStates.notesSizePercent = v} />
 
-    <LabelledSlider label="Note spacing (vertical)" value={visual.noteSpacingV}
-        min={0} max={5} step={0.1} onInput={(v) => visual.noteSpacingV = v} />
+    <LabelledSlider label="Note spacing (vertical)" value={visualStates.noteSpacingV}
+        min={0} max={5} step={0.1} onInput={(v) => visualStates.noteSpacingV = v} />
 
-    <LabelledSlider label="Note spacing (horizontal)" value={visual.noteSpacingH}
-        min={0} max={5} step={0.1} onInput={(v) => visual.noteSpacingH = v} />
+    <LabelledSlider label="Note spacing (horizontal)" value={visualStates.noteSpacingH}
+        min={0} max={5} step={0.1} onInput={(v) => visualStates.noteSpacingH = v} />
 
-    <LabelledSlider label="Keyboard position" value={visual.keyboardPosition}
-        min={0} max={80} onInput={(v) => visual.keyboardPosition = v} />
+    <LabelledSlider label="Keyboard position" value={visualStates.keyboardPosition}
+        min={0} max={80} onInput={(v) => visualStates.keyboardPosition = v} />
 
     <div class="flex items-center justify-between py-2">
         <span class="text-sm">Reduced animations</span>
         <ToggleSwitch
-            checked={visual.reducedAnimations}
+            checked={visualStates.reducedAnimations}
             label="Toggle reduced animations"
-            onToggle={() => visual.reducedAnimations = !visual.reducedAnimations}
+            onToggle={() => visualStates.reducedAnimations = !visualStates.reducedAnimations}
         />
     </div>
 </section>

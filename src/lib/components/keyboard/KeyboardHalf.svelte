@@ -15,12 +15,12 @@
 </script>
 
 <div class="keyboard-half"
-  style:gap="{visualStates.noteSpacingH}rem"
+  style:gap="{visualStates.noteSpacingV}rem"
 >
   {#each rows as row, rowIndex}
     <div 
       class="key-row"
-      style:gap="{visualStates.noteSpacingV}rem"
+      style:gap="{visualStates.noteSpacingH}rem"
     >
       {#each row as keyId, colIndex (keyId)}
         <KeyCap {keyId} {engine} {audio} svgPattern={keySvgPattern[rowIndex][colIndex]}/>

@@ -1,16 +1,19 @@
-import { browser } from "$app/env";
+import { browser } from "$app/environment";
 import { DEFAULT_VISUAL, type VisualSettings } from "$lib/settings/schema";
 import { debounce, loadFromStorage, saveToStorage } from "$lib/settings/storage";
 
 export const visualStates = $state({
-    charSpriteSizePercent: 100,
+    // EXPORTED AS SETTING
+    charSpriteSizePercent: 30,
     notesSizePercent: 100,
     noteSpacingV: 1, // default: 1rem
     noteSpacingH: 1, // default: 1rem
     keyboardPosition: 5, // default: 5rem
     reducedAnimations: false,
-    settingsOpen: false,
     showDetailedNoteNames: false,
+
+    // NOT EXPORTED AS SETTING
+    settingsOpen: false,
 })
 
 export function toggleSettingsOpen() {
@@ -29,7 +32,8 @@ if (browser) {
             void [
                 visualStates.charSpriteSizePercent, visualStates.notesSizePercent,
                 visualStates.noteSpacingV, visualStates.noteSpacingH,
-                visualStates.keyboardPosition, visualStates.reducedAnimations
+                visualStates.keyboardPosition, visualStates.reducedAnimations,
+                visualStates.showDetailedNoteNames,
             ];
             persist();
         });
@@ -40,3 +44,16 @@ if (browser) {
 export function resetVisualDefaults() {
     Object.assign(visualStates, DEFAULT_VISUAL);
 }
+
+export function getVisualSettingsSnapshot(): VisualSettings {
+    return {
+        charSpriteSizePercent: visualStates.charSpriteSizePercent,
+        notesSizePercent: visualStates.notesSizePercent,
+        noteSpacingV: visualStates.noteSpacingV,
+        noteSpacingH: visualStates.noteSpacingH,
+        keyboardPosition: visualStates.keyboardPosition,
+        reducedAnimations: visualStates.reducedAnimations,
+        showDetailedNoteNames: visualStates.showDetailedNoteNames,
+    };
+}
+    

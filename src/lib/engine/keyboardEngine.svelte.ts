@@ -7,7 +7,7 @@ import { SvelteSet } from "svelte/reactivity";
 import { keyboardMode0, keyboardMode1, keyboardMode2, leftKeyboardKeys, rightKeyboardKeys, type KeyboardModeType } from "./maps";
 import { toggleSettingsOpen } from "$lib/visual/menu.svelte";
 import { DEFAULT_KEYBOARD, type KeyboardSettings } from "$lib/settings/schema";
-import { browser } from "$app/env";
+import { browser } from "$app/environment";
 import { debounce, loadFromStorage, saveToStorage } from "$lib/settings/storage";
 
 export const skyStates = $state({
@@ -118,8 +118,18 @@ export function createKeyboardEngine() {
       
     function transposeBy(count: number) {
         // TODO: IMPORT LOGIC FOR CARRYING INTO OCTAVE PAST 0 OR 12
-        state.transposeValue = clamp(state.transposeValue + count, 0, 12);
-        log(`Transposed to ${state.transposeValue}`);
+        let finalTr: number;
+        let nTr = state.transposeValue + count; // new Transpose
+        let nOc = state.octave + Math.floor(nTr / 12); // new Octave
+        if (nOc > 3) {nOc = 3; finalTr = 12} // EXCEED
+        else if (nOc >= -2) {finalTr = (nTr >= 0) ? nTr % 12 : nTr + 12} // NORMAL
+        else {nOc = -2; finalTr = 0} // BELOW
+
+        state.transposeValue = finalTr;
+        state.octave = nOc;
+
+        // state.transposeValue = clamp(state.transposeValue + count, 0, 12);
+        log(`Transposed to ${state.transposeValue} on octave ${state.octave}.`);
     }
 
     function transposeTo(target: number) {
@@ -173,6 +183,11 @@ export function createKeyboardEngine() {
             // TODO THE REST
             case "escape": // toggle settings panel
                 toggleSettingsOpen();
+                break;
+            case "tab":
+                // TODO: SWAP TO THE LAST-ACTIVATED INSTRUMENT WITH PREVIOUS SETTINGS.
+                // "INSTRUMENT FLIP"
+                // NEED TO CACHE A COPY OF THE PREVIOUS INSTRUMENT'S SETTINGS?
         }
     }
 

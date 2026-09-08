@@ -2,7 +2,7 @@
 import { createAudioEngine } from "$lib/audio/audioEngine.svelte";
 import { listAvailableInstrumentIds } from "$lib/audio/instrAssets";
   // import Menu from "$lib/components/controls/SettingsPanel.svelte";
-  import SettingsWrapper from "$lib/components/controls/SettingsWrapper.svelte";
+import SettingsWrapper from "$lib/components/controls/SettingsWrapper.svelte";
 import KeyboardHalf from "$lib/components/keyboard/KeyboardHalf.svelte";
 import { createKeyboardEngine } from "$lib/engine/keyboardEngine.svelte";
 import { handleKeydown, handleKeyup } from "$lib/engine/keyHandler";
@@ -14,7 +14,8 @@ const engine = createKeyboardEngine();
 const audio = createAudioEngine();
 
 onMount(async () => { // THIS IS ASYNC SO INSTRUMENT LOADS BEFORE WE DEAL WITH THE STATES!!!
-  await audio.loadInstrument('piano');
+  // await audio.loadInstrument('piano');
+  if (!audio.currentInstrumentId) await audio.loadInstrument('piano');
   log("[PLAYER] Sustain: " + String(audio.isSustain));
   engine.toggleSAWR(audio.isSustain);
   engine.setSAWRDelay(audio.currentSAWRDelay);
@@ -32,6 +33,15 @@ let currentSustain = $derived(audio.isSustain);
 // engine.pressedKeys.forEach(x => {
 //   keysArr.push(String(x))
 // });
+
+$effect(() => {
+  engine.toggleSAWR(audio.isSustain);
+  engine.setSAWRDelay(audio.currentSAWRDelay);
+  log(`[PLAYER] Instrument ${audio.currentInstrumentId} | $effect: audio.currentSAWRDelay changed, setting engine.getSAWR to ${audio.currentSAWRDelay}.`);
+  // how do i code a force-release for all currently-held notes?
+  engine.resetKeys();
+
+})
 
 let instr = $derived(listAvailableInstrumentIds());
 let instrStr = $derived(String(instr).replace(/\b,\b/g,"<br>"));

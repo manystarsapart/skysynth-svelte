@@ -28,7 +28,7 @@ export interface InstrumentMeta {
     // TODO MORE
     
 
-    { id: 'piano', displayName: 'Piano', spriteCount: 10, kind: 'sampler', sustain: false },
+    { id: 'piano', displayName: 'Piano', spriteCount: 10, kind: 'sampler', sustain: false, recSAWRdelay: 50 },
     // { id: 'grandpiano',  displayName: 'Grand Piano', spriteCount: 0,  kind: 'sampler', sustain: false },
 
     // TODO!!!!!! OTHERS SOON!

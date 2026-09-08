@@ -56,19 +56,22 @@ export function createAudioEngine() {
 
     async function loadInstrument(id: string = "piano") {
         audioState.isLoading = true;
-        let node = instrumentCache.get(id);
-        if (!node) {
+        try {
             const meta = instrRegistry.find(i => i.id === id)!;
-            node = meta.kind === 'sampler' ? await buildSampler(id) : buildSynth(meta.synthType!);
-            instrumentCache.set(id, node);
+            let node = instrumentCache.get(id);
+            if (!node) {
+                node = meta.kind === 'sampler' ? await buildSampler(id) : buildSynth(meta.synthType!);
+                instrumentCache.set(id, node);
+            }
+            instrumentNode = node;
+            wireChain();
+            audioState.currentInstrumentID = id;
             audioState.currentSustain = meta.sustain;
             audioState.currentDelay = (meta.recSAWRdelay) ? meta.recSAWRdelay : 0;
             log(`[INSTR] Loaded instrument ${meta.displayName}. Sustain: ${audioState.currentSustain}. ${audioState.currentSustain ? `Recommended SAWR Delay: ${meta.recSAWRdelay}` : ''}`);
-            
+        } catch {
+            log(`[AUDIO] ERROR! Unknown instrument. Load failed!`);
         }
-        instrumentNode = node;
-        wireChain();
-        audioState.currentInstrumentID = id;
         audioState.isLoading = false;
     }
 

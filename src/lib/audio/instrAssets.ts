@@ -2,6 +2,8 @@
 // IMPORTING
 // ====================================================
 
+import { instrRegistry } from "./instrRegistry";
+
 const rawFiles = import.meta.glob<string>(
     '/src/lib/assets/audio/*/*.{mp3,wav}',
     // ALL instrument folders!
@@ -32,5 +34,5 @@ for (const [path, loader] of Object.entries(rawFiles)) {
 }
   
 export function listAvailableInstrumentIds(): string[] {
-    return [...instrAssetMap.keys()];
+    return instrRegistry.map(entry => entry.id);
 }
