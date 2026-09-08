@@ -10,8 +10,8 @@ import { instrRegistry } from "$lib/audio/instrRegistry";
 import SegmentedControl from "./SegmentedControl.svelte";
 import Stepper from "./Stepper.svelte";
 import { transposeMap } from "$lib/engine/maps";
-  import { SETTINGS_FILE_EXT, SETTINGS_VERSION, type SkySettingsFile } from "$lib/settings/schema";
-  import { getFormattedDateTimeForDownload } from "$lib/utils/helpers";
+import { SETTINGS_FILE_EXT, SETTINGS_VERSION, type SkySettingsFile } from "$lib/settings/schema";
+import { getFormattedDateTimeForDownload } from "$lib/utils/helpers";
 
 // ========================
 // INIT
@@ -85,14 +85,27 @@ function triggerImport() {
     }
 
 </script>
+<div class="sticky top-0 z-10 bg-gray-900/95 backdrop-blur
+    border-b border-gray-800 px-5 py-3">
+    <div class="flex items-center justify-between">
+        <h2 class="text-base font-semibold">Settings</h2>
+        <button
+            type="button"
+            onclick={() => visual.settingsOpen = false}
+            class="h-11 w-11 rounded-xl bg-gray-800
+                flex items-center justify-center"
+            aria-label="Close settings"
+        >
+            ✕
+        </button>
+    </div>
+</div>
+
 
 <!-- IMPORT / EXPORT  -->
-<section class="space-y-3">
-<br>
+<section class="rounded-2xl bg-gray-800/40 p-4 space-y-4">
     <div class="flex items-center justify-between">
         <h3 class="text-xs uppercase tracking-wide opacity-50">IMPORT / EXPORT</h3>
-        <button type="button" onclick={() => visual.settingsOpen = false}
-            class="text-lg px-2 py-1 rounded bg-gray-800 opacity-70">⬅︎</button>
     </div>
 
     <input
@@ -112,8 +125,9 @@ function triggerImport() {
 </section>
 
 <!-- AUDIO -->
-<section class="space-y-3">
+<section class="rounded-2xl bg-gray-800/40 p-4 space-y-4">
     <div class="flex items-center justify-between">
+
         <h3 class="text-xs uppercase tracking-wide opacity-50">Audio</h3>
         <button type="button" onclick={() => audio.resetToDefaults()}
             class="text-xs px-2 py-1 rounded bg-gray-800 opacity-70">Reset</button>
@@ -121,7 +135,7 @@ function triggerImport() {
 
     <div>
         <span class="text-sm">Instrument</span>
-        <div class="flex gap-2 overflow-x-auto snap-x snap-mandatory pb-2 mt-1 scrollbar-hide">
+        <div class="flex gap-2 overflow-x-auto snap-x snap-mandatory pb-2 mt-1 touch-pan-x">
             {#each listAvailableInstrumentIds() as id}
                 <button
                     type="button"
@@ -164,7 +178,7 @@ function triggerImport() {
 </section>
 
 <!-- ENGINE -->
-<section class="space-y-3">
+<section class="space-y-3rounded-2xl bg-gray-800/40 p-4 space-y-4">
     <div class="flex items-center justify-between">
         <h3 class="text-xs uppercase tracking-wide opacity-50">Keyboard</h3>
         <button type="button" onclick={() => engine.resetToDefaults()}
@@ -203,7 +217,7 @@ function triggerImport() {
 </section>
 
 <!-- VISUAL -->
-<section class="space-y-3">
+<section class="rounded-2xl bg-gray-800/40 p-4 space-y-4">
     <div class="flex items-center justify-between">
         <h3 class="text-xs uppercase tracking-wide opacity-50">Visual</h3>
         <button type="button" onclick={resetVisualDefaults}

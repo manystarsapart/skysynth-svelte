@@ -26,18 +26,19 @@ let open = $derived(visualStates.settingsOpen);
 {#if open}
 <div
     class="fixed z-50 bg-gray-900 text-gray-100 overflow-y-auto
-           inset-x-0 bottom-0 max-h-[75vh] rounded-t-2xl
+           right-0 top-0 bottom-0 w-[55vw] min-w-70 max-w-105
+           rounded-l-2xl
            pb-[env(safe-area-inset-bottom)]
-           md:inset-x-auto md:right-0 md:top-0 md:bottom-0 md:h-full md:max-h-none
-           md:w-96 md:rounded-t-none md:rounded-l-2xl"
-    transition:fly={{ y: 300, duration: 200 }}
+           md:right-0 md:top-0 md:bottom-0 md:h-full md:w-96
+           md:max-w-none md:min-w-0 md:rounded-t-none md:rounded-l-2xl"
+    transition:fly={{ x: 300, duration: 200 }}
 >
     <!-- drag handle, mobile only -->
     <div class="md:hidden flex justify-center py-2">
         <div class="h-1.5 w-10 rounded-full bg-gray-600"></div>
     </div>
 
-    <div class="px-5 pb-6 space-y-6">
+    <div class="settings-scroll overflow-y-auto px-5 pb-6 space-y-6">
         <SettingsPanel {engine} {audio} />
     </div>
 </div>

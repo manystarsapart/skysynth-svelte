@@ -15,7 +15,7 @@
         {min} {max} {step}
         value={value}
         oninput={(e) => onInput(Number(e.currentTarget.value))}
-        class="w-full h-8 touch-none accent-teal-500"
+        class="w-full h-10 touch-none accent-teal-500"
         aria-label={label}
     />
 </div>
