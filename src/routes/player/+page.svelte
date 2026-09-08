@@ -16,10 +16,6 @@ const audio = createAudioEngine();
 onMount(async () => { // THIS IS ASYNC SO INSTRUMENT LOADS BEFORE WE DEAL WITH THE STATES!!!
   // await audio.loadInstrument('piano');
   if (!audio.currentInstrumentId) await audio.loadInstrument('piano');
-  log("[PLAYER] Sustain: " + String(audio.isSustain));
-  engine.toggleSAWR(audio.isSustain);
-  engine.setSAWRDelay(audio.currentSAWRDelay);
-  log("[PLAYER] SAWR: " + String(engine.getSAWR));
 });
 
 let currentTranspose = $derived(engine.transposeValue);
@@ -35,13 +31,14 @@ let currentSustain = $derived(audio.isSustain);
 // });
 
 $effect(() => {
+  if (!audio.currentInstrumentId) return; // IF NOTHING IS LOADED. THIS HAPPENS WHEN PAGE FIRST LOADS
+
   engine.toggleSAWR(audio.isSustain);
   engine.setSAWRDelay(audio.currentSAWRDelay);
-  log(`[PLAYER] Instrument ${audio.currentInstrumentId} | $effect: audio.currentSAWRDelay changed, setting engine.getSAWR to ${audio.currentSAWRDelay}.`);
-  // how do i code a force-release for all currently-held notes?
   engine.resetKeys();
 
-})
+  log(`[PLAYER] Instrument ${audio.currentInstrumentId}: SAWR=${audio.isSustain}, delay=${audio.currentSAWRDelay}`);
+});
 
 let instr = $derived(listAvailableInstrumentIds());
 let instrStr = $derived(String(instr).replace(/\b,\b/g,"<br>"));

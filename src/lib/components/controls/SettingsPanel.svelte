@@ -114,31 +114,26 @@ function resetAll() {
 
 
 </script>
-<div class="sticky top-0 z-10 bg-gray-900/95 backdrop-blur
-    border-b border-gray-800 px-5 py-3">
+
+<div class="sticky top-0 z-10 bg-gray-900/95 backdrop-blur border-b border-gray-800 px-5 py-3">
     <div class="flex items-center justify-between">
         <h2 class="text-base font-semibold">Settings</h2>
-        <div class="sticky top-0 z-10 bg-gray-900/95 backdrop-blur border-b border-gray-800 px-5 py-3">
-            <div class="flex items-center justify-between">
-                <h2 class="text-base font-semibold">Settings</h2>
-                <div class="flex items-center gap-2">
-                    <button
-                        type="button"
-                        onclick={resetAll}
-                        class="text-xs px-3 py-2 rounded-lg bg-gray-800 opacity-80 hover:opacity-100"
-                    >Reset all</button>
-                </div>
-            </div>
-        </div>
-        <button
+        <div class="flex items-center gap-2">
+            <button
+                type="button"
+                onclick={resetAll}
+                class="text-xs px-3 py-2 rounded-lg bg-gray-800 opacity-80 hover:opacity-100"
+            >Reset all</button>
+            <button
             type="button"
             onclick={() => visualStates.settingsOpen = false}
             class="h-11 w-11 rounded-xl bg-gray-800
                 flex items-center justify-center"
             aria-label="Close settings"
-        >
+            >
             ✕
-        </button>
+            </button>
+        </div>
     </div>
 </div>
 

@@ -63,6 +63,7 @@ export function createAudioEngine() {
                 node = meta.kind === 'sampler' ? await buildSampler(id) : buildSynth(meta.synthType!);
                 instrumentCache.set(id, node);
             }
+            releaseAll();
             instrumentNode = node;
             wireChain();
             audioState.currentInstrumentID = id;
@@ -132,6 +133,13 @@ export function createAudioEngine() {
         });
     }
 
+    function releaseAll() {
+        if (!instrumentNode) return;
+        for (let midi = 0; midi < 128; midi++) {
+            instrumentNode.triggerRelease(Tone.Frequency(midi, 'midi').toFrequency());
+        }
+    }
+
     // ========================
     // EXPOSING EVERYTHING
     // ========================
@@ -145,8 +153,10 @@ export function createAudioEngine() {
         get volumePercent() { return audioState.volumePercent; },
         
         loadInstrument, setVolumePercent, play, release, releaseAfter,
-        getSettingsSnapshot, applySettings, resetToDefaults,
+        getSettingsSnapshot, applySettings, resetToDefaults, releaseAll,
     };
 }
+
+
 
   export type AudioEngine = ReturnType<typeof createAudioEngine>;
