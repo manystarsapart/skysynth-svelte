@@ -55,6 +55,7 @@ export const keyboardMode2: KeyboardModeType = {
     'n': 65, 'm': 67, ',': 69, '.': 71, '/': 72,
 };
 
+export const maps: KeyboardModeType[] = [keyboardMode0, keyboardMode1, keyboardMode2];
 
 // for keys pressed to initiate transposing
 export type PitchMap = Record<string,number>

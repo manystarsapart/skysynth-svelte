@@ -4,7 +4,7 @@
 
 import { log } from "$lib/utils/logging";
 import { SvelteSet } from "svelte/reactivity";
-import { keyboardMode0, keyboardMode1, keyboardMode2, leftKeyboardKeys, rightKeyboardKeys, type KeyboardModeType } from "./maps";
+import { keyboardMode0, keyboardMode1, keyboardMode2, leftKeyboardKeys, maps, rightKeyboardKeys, type KeyboardModeType } from "./maps";
 import { toggleSettingsOpen } from "$lib/visual/menu.svelte";
 import { DEFAULT_KEYBOARD, type KeyboardSettings } from "$lib/settings/schema";
 import { browser } from "$app/environment";
@@ -45,7 +45,7 @@ export function createKeyboardEngine() {
     // ========================
     // KEYBOARD MODE 
     // ========================
-    const maps: KeyboardModeType[] = [keyboardMode0, keyboardMode1, keyboardMode2];
+    
     const activeMap = () => maps[state.currentKeyboardMode];
 
     function setKeyboardMode(mode: number) {
@@ -129,22 +129,22 @@ export function createKeyboardEngine() {
         state.octave = nOc;
 
         // state.transposeValue = clamp(state.transposeValue + count, 0, 12);
-        log(`Transposed to ${state.transposeValue} on octave ${state.octave}.`);
+        log(`[KEYBOARD] Transposed to ${state.transposeValue} on octave ${state.octave}.`);
     }
 
     function transposeTo(target: number) {
         state.transposeValue = clamp(target, 0, 12);
-        log(`Transposed to ${state.transposeValue}`);
+        log(`[KEYBOARD] Transposed to ${state.transposeValue}`);
     }
 
     function octaveBy(count: number) {
         state.octave = clamp(state.octave + count, -2, 3);
-        log(`Octaved to ${state.octave}`);
+        log(`[KEYBOARD] Octaved to ${state.octave}`);
     }
 
     function octaveTo(target: number) {
         state.octave = clamp(target, -2, 3);
-        log(`Octaved to ${state.octave}`);
+        log(`[KEYBOARD] Octaved to ${state.octave}`);
     }
 
     function toggleSAWR(target?: boolean) {
@@ -153,7 +153,13 @@ export function createKeyboardEngine() {
     function setSAWRDelay(target: number) {
         // state.sawrDelay = clamp(target, 0, 100);
         state.sawrDelay = target;
-        log(`Set SAWR delay to ${state.sawrDelay}`);
+        log(`[KEYBOARD] Set SAWR delay to ${state.sawrDelay}`);
+    }
+
+    function applyRecommendedSAWR(sustain: boolean, delayMs: number) {
+        state.sawrEnabled = sustain;
+        state.sawrDelay = delayMs;
+        log(`[KEYBOARD] Applied instrument-recommended SAWR: enabled=${sustain}, delay=${delayMs}ms`);
     }
 
     function resolveTrOC(k: string) {
@@ -265,13 +271,14 @@ export function createKeyboardEngine() {
         get pressedKeys(): ReadonlySet<string> { return pressedKeys; }, // UI indicator later......
         isDown, markDown, markUp,
         noteDown, noteUp,
-        resolveTrOC, resolveMenu,
+        resolveTrOC, resolveMenu, resolveMod,
         transposeBy, transposeTo,
         octaveBy, octaveTo,
-        toggleSAWR, setSAWRDelay,
+        toggleSAWR, setSAWRDelay, applyRecommendedSAWR,
         setKeyboardMode,
         reset, resetKeys,
         getSettingsSnapshot, applySettings, resetToDefaults,
+        activeMap,
     }
 }
 

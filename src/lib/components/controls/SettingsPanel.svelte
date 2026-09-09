@@ -216,7 +216,12 @@ function resetAll() {
             {#each listAvailableInstrumentIds() as id}
                 <button
                     type="button"
-                    onclick={() => audio.loadInstrument(id)}
+                    onclick={
+                        async() => {
+                            await audio.loadInstrument(id);
+                            engine.applyRecommendedSAWR(audio.isSustain, audio.currentSAWRDelay);
+                        }
+                    }
                     class="snap-start shrink-0 h-11 px-4 rounded-full text-sm whitespace-nowrap transition-colors
                            {audio.currentInstrumentId === id ? 'bg-teal-600 text-white' : 'bg-gray-700 text-gray-300'}"
                 >{instrRegistry.find(instr => instr.id == id)?.displayName}</button>
@@ -252,6 +257,15 @@ function resetAll() {
             />
         </div>
     {/if}
+
+    <p class="text-xs opacity-50">
+        Recommended for {instrRegistry.find(i => i.id === audio.currentInstrumentId)?.displayName}:
+        {audio.isSustain ? `delayed release (${audio.currentSAWRDelay}ms)` : 'no delayed release needed'}
+    </p>
+    <button class="p-2 w-full h-10 rounded-lg bg-gray-700 text-sm"
+        onclick={() => engine.applyRecommendedSAWR(audio.isSustain, audio.currentSAWRDelay)}>
+        Reset to recommended
+    </button>
 </section>
 
 <!-- ENGINE -->

@@ -1,3 +1,5 @@
+import { transposeMap } from "$lib/engine/maps";
+
 export const getFormattedDateTimeForDownload = (): string => {
     const now = new Date();
   
@@ -18,15 +20,15 @@ export const getFormattedDateTimeForDownload = (): string => {
     return formattedDateTime;
   };
 
+const noteNames: string[] = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'Bb', 'B'];
+
 export function midiToSPN(midiNumber:number) {
-    const noteNames: string[] = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'Bb', 'B'];
     const noteIndex: number = midiNumber % 12;
     const octave: number = Math.floor((midiNumber) / 12) - 1;
     return noteNames[noteIndex] + octave;
 }
 
 export function midiToNote(midiNumber:number) {
-    const noteNames: string[] = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'Bb', 'B'];
     const noteIndex: number = midiNumber % 12;
     return noteNames[noteIndex];
 }
@@ -34,4 +36,9 @@ export function midiToNote(midiNumber:number) {
 export function midiToOctave(midiNumber:number) {
     const octave: number = Math.floor((midiNumber) / 12) - 1;
     return octave;
+}
+
+export function transposeToNote(transposeValue:number) {
+	const note = transposeMap[transposeValue];
+	return note;
 }
