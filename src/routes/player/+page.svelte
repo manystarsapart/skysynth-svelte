@@ -8,6 +8,7 @@ import KeyboardHalf from "$lib/components/keyboard/KeyboardHalf.svelte";
 import { createKeyboardEngine } from "$lib/engine/keyboardEngine.svelte";
 import { handleKeydown, handleKeyup } from "$lib/engine/keyHandler";
 import { maps } from "$lib/engine/maps";
+  import { presetState } from "$lib/settings/presets.svelte";
 import { loadFromStorage } from "$lib/settings/storage";
 import { midiToSPN, transposeToNote } from "$lib/utils/helpers";
 import { log } from "$lib/utils/logging";
@@ -38,6 +39,11 @@ onMount(async () => { // THIS IS ASYNC SO INSTRUMENT LOADS BEFORE WE DEAL WITH T
 // await audio.loadInstrument('piano');
 // if (!audio.currentInstrumentId) await audio.loadInstrument('piano');
 	if (!audio.currentInstrumentId) await selectInstrument('piano'); // third times the charm
+	for (const slot of presetState.slots) {
+		if (slot.file?.audio?.instrumentId) {
+			audio.prewarmInstrument(slot.file.audio.instrumentId);
+		}
+	}
 });
   
   

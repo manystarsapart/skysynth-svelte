@@ -51,6 +51,25 @@ export function createAudioEngine() {
     }
 
     // ========================
+    // PREWARM
+    // ========================
+
+    async function prewarmInstrument(id: string) {
+        // loads & caches sampler in cache
+        // THIS DOES NOT TOUCH CURRENT INSTRUMENT
+        if (instrumentCache.has(id)) return;
+        const meta = instrRegistry.find(i => i.id === id);
+        if (!meta) return;
+        try {
+            const node = meta.kind === 'sampler' ? await buildSampler(id) : buildSynth(meta.synthType!);
+            instrumentCache.set(id, node);
+            log(`[AUDIO] Pre-warmed instrument cache for "${id}".`);
+        } catch (err) {
+            log(`[AUDIO] Pre-warm failed for "${id}": ${err}`);
+        }
+    }
+
+    // ========================
     // INSTRUMENT
     // ========================
 
@@ -111,7 +130,7 @@ export function createAudioEngine() {
         };
     }
     
-    function applySettings(s: Partial<AudioSettings>) {
+    async function applySettings(s: Partial<AudioSettings>) {
         if (s.instrumentId) loadInstrument(s.instrumentId); 
         if (s.volumePercent !== undefined) setVolumePercent(s.volumePercent);
     }
@@ -152,7 +171,8 @@ export function createAudioEngine() {
         get currentInstrumentId() { return audioState.currentInstrumentID; },
         get volumePercent() { return audioState.volumePercent; },
         
-        loadInstrument, setVolumePercent, play, release, releaseAfter,
+        loadInstrument, prewarmInstrument,
+        setVolumePercent, play, release, releaseAfter,
         getSettingsSnapshot, applySettings, resetToDefaults, releaseAll,
     };
 }

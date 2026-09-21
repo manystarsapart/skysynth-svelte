@@ -80,6 +80,12 @@ async function handleImportFile(e: Event) {
         if (slotIndex !== null) { // GOING INTO PRESETS
             const label = prompt('Name this preset (optional):', `Preset ${slotIndex}`) ?? '';
             assignPreset(slotIndex, parsed as SkySettingsFile, label);
+
+            if (parsed.audio?.instrumentId) {
+                // no async needed since this already runs in background
+                audio.prewarmInstrument(parsed.audio.instrumentId);
+            }
+
         } else { // LIVE IMPORT (NOT PRESET)
             await applySettingsFile(parsed as SkySettingsFile, engine, audio);
         }
@@ -264,7 +270,7 @@ function resetAll() {
     </p>
     <button class="p-2 w-full h-10 rounded-lg bg-gray-700 text-sm"
         onclick={() => engine.applyRecommendedSAWR(audio.isSustain, audio.currentSAWRDelay)}>
-        Reset to recommended
+        Apply recommended settings
     </button>
 </section>
 

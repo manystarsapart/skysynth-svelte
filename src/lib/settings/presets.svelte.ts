@@ -44,6 +44,7 @@ export function renamePreset(index: number, label: string) {
 
 const presetKeyToSlot: Record<string, number> = {
     '1':1,'2':2,'3':3,'4':4,'5':5,'6':6,'7':7,'8':8,'9':9,
+    // in case we want to expand into "0", "-", "=" in the future
   };
   
 export async function loadPresetForKey(k: string, engine: KeyboardEngine, audio: AudioEngine) {
