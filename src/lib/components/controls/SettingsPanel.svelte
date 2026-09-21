@@ -127,12 +127,12 @@ function resetAll() {
         <div class="flex items-center gap-2">
             <button
                 type="button"
-                onclick={resetAll}
+                onpointerdown={resetAll}
                 class="text-xs px-3 py-2 rounded-lg bg-gray-800 opacity-80 hover:opacity-100"
             >Reset all</button>
             <button
             type="button"
-            onclick={() => visualStates.settingsOpen = false}
+            onpointerdown={() => visualStates.settingsOpen = false}
             class="h-11 w-11 rounded-xl bg-gray-800
                 flex items-center justify-center"
             aria-label="Close settings"
@@ -159,9 +159,9 @@ function resetAll() {
     />
 
     <div class="flex gap-2 px-1 pb-2 border-b border-gray-700">
-        <button type="button" onclick={exportSettings}
+        <button type="button" onpointerdown={exportSettings}
             class="flex-1 h-10 rounded-lg bg-gray-700 text-sm">Export settings</button>
-        <button type="button" onclick={triggerImport}
+        <button type="button" onpointerdown={triggerImport}
             class="flex-1 h-10 rounded-lg bg-gray-700 text-sm">Import settings</button>
     </div>
 </section>
@@ -186,20 +186,20 @@ function resetAll() {
                 {#if slot.file}
                     <div class="flex justify-around">
                         <span class="text-sm truncate">{slot.label || `Preset ${slot.index}`}</span>
-                        <button onclick={() => renameLabel(slot)}>✎</button>
+                        <button onpointerdown={() => renameLabel(slot)}>✎</button>
                         
                     </div>
                     
                     <div class="flex gap-1">
-                        <button onclick={() => loadSlot(slot.file)}
+                        <button onpointerdown={() => loadSlot(slot.file)}
                             class="flex-1 text-xs rounded bg-teal-600 py-1">Load</button>
-                        <button onclick={() => clearPreset(slot.index)}
+                        <button onpointerdown={() => clearPreset(slot.index)}
                             class="text-xs rounded bg-gray-600 px-2">✕</button>
                     </div>
                 {:else}
-                    <button onclick={() => assignPreset(slot.index, buildSettingsFile(engine, audio))}
+                    <button onpointerdown={() => assignPreset(slot.index, buildSettingsFile(engine, audio))}
                         class="text-xs rounded bg-gray-600 py-1">Save current</button>
-                    <button onclick={() => triggerImportToSlot(slot.index)}
+                    <button onpointerdown={() => triggerImportToSlot(slot.index)}
                         class="text-xs rounded bg-gray-600 py-1">Upload file</button>
                 {/if}
             </div>
@@ -212,7 +212,7 @@ function resetAll() {
     <div class="flex items-center justify-between">
 
         <h3 class="text-xs uppercase tracking-wide opacity-50">Audio</h3>
-        <button type="button" onclick={() => audio.resetToDefaults()}
+        <button type="button" onpointerdown={() => audio.resetToDefaults()}
             class="text-xs px-2 py-1 rounded bg-gray-800 opacity-70">Reset</button>
     </div>
 
@@ -222,7 +222,7 @@ function resetAll() {
             {#each listAvailableInstrumentIds() as id}
                 <button
                     type="button"
-                    onclick={
+                    onpointerdown={
                         async() => {
                             await audio.loadInstrument(id);
                             engine.applyRecommendedSAWR(audio.isSustain, audio.currentSAWRDelay);
@@ -269,7 +269,7 @@ function resetAll() {
         {audio.isSustain ? `delayed release (${audio.currentSAWRDelay}ms)` : 'no delayed release needed'}
     </p>
     <button class="p-2 w-full h-10 rounded-lg bg-gray-700 text-sm"
-        onclick={() => engine.applyRecommendedSAWR(audio.isSustain, audio.currentSAWRDelay)}>
+        onpointerdown={() => engine.applyRecommendedSAWR(audio.isSustain, audio.currentSAWRDelay)}>
         Apply recommended settings
     </button>
 </section>
@@ -278,7 +278,7 @@ function resetAll() {
 <section class="space-y-3rounded-2xl bg-gray-800/40 p-4 space-y-4">
     <div class="flex items-center justify-between">
         <h3 class="text-xs uppercase tracking-wide opacity-50">Keyboard</h3>
-        <button type="button" onclick={() => engine.resetToDefaults()}
+        <button type="button" onpointerdown={() => engine.resetToDefaults()}
             class="text-xs px-2 py-1 rounded bg-gray-800 opacity-70">Reset</button>
     </div>
 
@@ -317,7 +317,7 @@ function resetAll() {
 <section class="rounded-2xl bg-gray-800/40 p-4 space-y-4">
     <div class="flex items-center justify-between">
         <h3 class="text-xs uppercase tracking-wide opacity-50">Visual</h3>
-        <button type="button" onclick={resetVisualDefaults}
+        <button type="button" onpointerdown={resetVisualDefaults}
             class="text-xs px-2 py-1 rounded bg-gray-800 opacity-70">Reset</button>
     </div>
 
