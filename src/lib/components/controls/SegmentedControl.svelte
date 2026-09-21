@@ -9,7 +9,7 @@
     {#each options as opt}
         <button
             type="button"
-            onclick={() => onSelect(opt.value)}
+            onpointerdown={() => onSelect(opt.value)}
             class="flex-1 h-10 rounded-md text-sm transition-colors
                    {value === opt.value ? 'bg-teal-600 text-white' : 'text-gray-400'}"
         >{opt.label}</button>

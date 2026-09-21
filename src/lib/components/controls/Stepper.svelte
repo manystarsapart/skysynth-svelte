@@ -11,7 +11,7 @@
     <div class="flex items-center gap-3">
         <button
             type="button"
-            onclick={onDecrement}
+            onpointerdown={onDecrement}
             disabled={disabledDown}
             aria-label="Decrease {label}"
             class="h-11 w-11 rounded-full bg-gray-700 disabled:opacity-30 active:scale-90 transition-transform"
@@ -19,7 +19,7 @@
         <span class="w-12 text-center tabular-nums">{displayValue ?? value}</span>
         <button
             type="button"
-            onclick={onIncrement}
+            onpointerdown={onIncrement}
             disabled={disabledUp}
             aria-label="Increase {label}"
             class="h-11 w-11 rounded-full bg-gray-700 disabled:opacity-30 active:scale-90 transition-transform"

@@ -9,7 +9,7 @@
     role="switch"
     aria-checked={checked}
     aria-label={label}
-    onclick={onToggle}
+    onpointerdown={onToggle}
     class="relative h-8 w-14 rounded-full transition-colors duration-200 shrink-0
            {checked ? 'bg-teal-600' : 'bg-gray-600'}"
 >

@@ -17,7 +17,7 @@ let open = $derived(visualStates.settingsOpen);
 
 <button
     type="button"
-    onclick={() => visualStates.settingsOpen = !open}
+    onpointerdown={() => visualStates.settingsOpen = !open}
     aria-label="Open settings"
     class="fixed top-4 right-4 z-40 h-11 w-11 rounded-full bg-gray-800/80 backdrop-blur
            flex items-center justify-center md:top-6 md:right-6"
