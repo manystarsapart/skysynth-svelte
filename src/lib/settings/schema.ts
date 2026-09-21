@@ -6,6 +6,7 @@ export interface VisualSettings {
     keyboardPosition: number;
     reducedAnimations: boolean;
     showDetailedNoteNames: boolean;
+    showKeyOutline: boolean;
 }
 
 export interface KeyboardSettings {
@@ -28,7 +29,8 @@ export const DEFAULT_VISUAL: VisualSettings = {
     noteSpacingH: 1,
     keyboardPosition: 5,
     reducedAnimations: false,
-    showDetailedNoteNames: false,
+    showDetailedNoteNames: true,
+    showKeyOutline: false,
 };
 
 export const DEFAULT_KEYBOARD: KeyboardSettings = {

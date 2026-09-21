@@ -4,6 +4,7 @@
     import { visualStates } from '$lib/visual/menu.svelte';
   import { onDestroy, onMount } from 'svelte';
   import { playNoteDownAnimation, playNoteUpAnimation, registerKeyElement, unregisterKeyElement } from '$lib/visual/keyAnimations';
+  import { midiToNote, midiToOctave } from '$lib/utils/helpers';
   
     let { keyId, engine, audio, svgPattern }: {
         keyId: string; engine: KeyboardEngine; audio: AudioEngine; svgPattern: number;
@@ -37,23 +38,36 @@
         3: `<path d="M 31.939164,9.4384766 A 22.500162,22.500162 0 0 0 9.4384767,31.939165 22.500162,22.500162 0 0 0 31.939164,54.438477 22.500162,22.500162 0 0 0 54.438476,31.939165 22.500162,22.500162 0 0 0 31.939164,9.4384766 Z m 0,2.5303484 A 19.969496,19.969496 0 0 1 51.908129,31.939165 19.969496,19.969496 0 0 1 31.939164,51.90813 19.969496,19.969496 0 0 1 11.968824,31.939165 19.969496,19.969496 0 0 1 31.939164,11.968825 Z"></path>`,
     } as const;
 
+    let displayMidi = $derived(
+        engine.activeMap()[keyId] + engine.transposeValue + engine.octave * 12 + engine.resolveMod(keyId)
+    );
 </script>
   
 <button 
     bind:this={el}
-    class="keyboard-key ..."
+    class="keyboard-key font-xxl..."
     class:key-active={engine.pressedKeys.has(keyId)}
     style:transition={engine.getSAWR ? "none" : "0.3s ease-out"}
     style:width="{visualStates.notesSizePercent * 6 / 100}rem"
+    style:outline="{visualStates.showKeyOutline ? "gray solid 0.2rem" : "none"}"
     onpointerdown={down}
     onpointerup={up}
 >
+<div 
+    class="absolute p-0 m-0 b-0 gap-0" 
+    style:display="{visualStates.showDetailedNoteNames ? "block": "none"}"
+>
+    <div style:font-size="{visualStates.notesSizePercent * 1.5 / 100}rem">
+        {midiToNote(displayMidi)}<sub>{midiToOctave(displayMidi)}</sub>
+    </div>
+</div>
+
 <svg class="svg-note" viewBox="0 0 63.87 63.87" xmlns="http://www.w3.org/2000/svg" style="fill: currentcolor; stroke: currentcolor;">{@html svgMap[svgPattern]}</svg>   
 </button>
 
 <style>
     .keyboard-key {
-        /* outline: red solid 1px; */
+        /* outline: gray solid 0.2rem; */
         border-radius: 1rem; /* TODO: MAKE THIS CUSTOMISABLE */
         /* width: 6rem; TODO: MAKE THIS CUSTOMISABLE */
         aspect-ratio: 1 / 1 !important;

@@ -344,4 +344,22 @@ function resetAll() {
             onToggle={() => visualStates.reducedAnimations = !visualStates.reducedAnimations}
         />
     </div>
+
+    <div class="flex items-center justify-between py-2">
+        <span class="text-sm">Show note names</span>
+        <ToggleSwitch
+            checked={visualStates.showDetailedNoteNames}
+            label="Show note names"
+            onToggle={() => visualStates.showDetailedNoteNames = !visualStates.showDetailedNoteNames}
+        />
+    </div>
+
+    <div class="flex items-center justify-between py-2">
+        <span class="text-sm">Show key outline</span>
+        <ToggleSwitch
+            checked={visualStates.showKeyOutline}
+            label="Show key outline"
+            onToggle={() => visualStates.showKeyOutline = !visualStates.showKeyOutline}
+        />
+    </div>
 </section>

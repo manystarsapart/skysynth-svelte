@@ -11,6 +11,7 @@ export const visualStates = $state({
     keyboardPosition: 5, // default: 5rem
     reducedAnimations: false,
     showDetailedNoteNames: false,
+    showKeyOutline: false,
 
     // NOT EXPORTED AS SETTING
     settingsOpen: false,
@@ -33,7 +34,7 @@ if (browser) {
                 visualStates.charSpriteSizePercent, visualStates.notesSizePercent,
                 visualStates.noteSpacingV, visualStates.noteSpacingH,
                 visualStates.keyboardPosition, visualStates.reducedAnimations,
-                visualStates.showDetailedNoteNames,
+                visualStates.showDetailedNoteNames, visualStates.showKeyOutline,
             ];
             persist();
         });
@@ -54,6 +55,7 @@ export function getVisualSettingsSnapshot(): VisualSettings {
         keyboardPosition: visualStates.keyboardPosition,
         reducedAnimations: visualStates.reducedAnimations,
         showDetailedNoteNames: visualStates.showDetailedNoteNames,
+        showKeyOutline: visualStates.showKeyOutline,
     };
 }
     
