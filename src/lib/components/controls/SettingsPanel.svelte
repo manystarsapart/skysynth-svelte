@@ -15,6 +15,7 @@ import { getFormattedDateTimeForDownload } from "$lib/utils/helpers";
 import { assignPreset, clearPreset, presetState, renamePreset } from "$lib/settings/presets.svelte";
 import { applySettingsFile, buildSettingsFile } from "$lib/settings/apply";
 import { log } from "$lib/utils/logging";
+  import { skyStates } from "$lib/settings/skystates";
 
 // ========================
 // INIT
@@ -362,4 +363,33 @@ function resetAll() {
             onToggle={() => visualStates.showKeyOutline = !visualStates.showKeyOutline}
         />
     </div>
+</section>
+
+<!-- STATISTICS -->
+<section class="rounded-2xl bg-gray-800/40 p-4 space-y-4">
+    <div class="flex items-center justify-between">
+        <h3 class="text-xs uppercase tracking-wide opacity-50">Statistics</h3>
+    </div>
+
+    WIP.
+
+</section>
+
+<!-- ACKNOWLEDGEMENTS -->
+<section class="rounded-2xl bg-gray-800/40 p-4 space-y-4">
+    <div class="flex items-center justify-between">
+        <h3 class="text-xs uppercase tracking-wide opacity-50">Acknowledgements</h3>
+    </div>
+    <div class="text-sm py-0">
+        Made by <b><u>@manystarsapart</u></b>.<br>
+        For any feedback, please contact support@skysynth.space. <br>
+        Current SkySynth version: {skyStates.skysynthVersion} <br>
+        Last updated: {skyStates.skysynthLastUpdateDate} <br>
+        <br>
+        Github Repo: <a href="https://github.com/manystarsapart/skysynth-svelte"><u>skysynth-svelte</u></a>
+
+    </div>
+    
+
+
 </section>

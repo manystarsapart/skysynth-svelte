@@ -4,23 +4,11 @@
 
 import { log } from "$lib/utils/logging";
 import { SvelteSet } from "svelte/reactivity";
-import { keyboardMode0, keyboardMode1, keyboardMode2, leftKeyboardKeys, maps, rightKeyboardKeys, type KeyboardModeType } from "./maps";
+import { leftKeyboardKeys, maps, rightKeyboardKeys } from "./maps";
 import { toggleSettingsOpen } from "$lib/visual/menu.svelte";
 import { DEFAULT_KEYBOARD, type KeyboardSettings } from "$lib/settings/schema";
 import { browser } from "$app/environment";
 import { debounce, loadFromStorage, saveToStorage } from "$lib/settings/storage";
-
-export const skyStates = $state({
-    // VERSIONING
-    skysynthVersion: "0.20.6",
-    skysynthLastUpdateDate: "2026-09-03",
-    skysynthSheetVersion: "1.2",
-    skysynthVersionOnLastVisit: null as string | null,
-    // not ported from vanilla: cosmetic changes
-
-    
-})
-
 
 // ====================================================
 // KEYBOARD ENGINE
