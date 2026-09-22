@@ -49,7 +49,7 @@ export function createKeyboardEngine() {
     const activeMap = () => maps[state.currentKeyboardMode];
 
     function setKeyboardMode(mode: number) {
-        if (mode < 0 || mode > 2) return; // catch err
+        if (mode < 0 || mode > 3) return; // catch err
         state.currentKeyboardMode = mode;
       }
 

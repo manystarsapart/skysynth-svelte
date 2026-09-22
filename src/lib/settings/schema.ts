@@ -29,7 +29,7 @@ export const DEFAULT_VISUAL: VisualSettings = {
     noteSpacingH: 1,
     keyboardPosition: 5,
     reducedAnimations: false,
-    showDetailedNoteNames: true,
+    showDetailedNoteNames: false,
     showKeyOutline: false,
 };
 

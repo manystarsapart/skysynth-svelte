@@ -55,7 +55,18 @@ export const keyboardMode2: KeyboardModeType = {
     'n': 65, 'm': 67, ',': 69, '.': 71, '/': 72,
 };
 
-export const maps: KeyboardModeType[] = [keyboardMode0, keyboardMode1, keyboardMode2];
+// for +0
+export const keyboardMode3: KeyboardModeType = {
+    'q': 48, 'w': 50, 'e': 52, 'r': 53, 't': 55,
+    'a': 57, 's': 59, 'd': 60, 'f': 62, 'g': 64,
+    'z': 65, 'x': 67, 'c': 69, 'v': 71, 'b': 72,
+
+    'y': 48, 'u': 50, 'i': 52, 'o': 53, 'p': 55,
+    'h': 57, 'j': 59, 'k': 60, 'l': 62, ';': 64,
+    'n': 65, 'm': 67, ',': 69, '.': 71, '/': 72,
+}
+
+export const maps: KeyboardModeType[] = [keyboardMode0, keyboardMode1, keyboardMode2, keyboardMode3];
 
 // for keys pressed to initiate transposing
 export type PitchMap = Record<string,number>

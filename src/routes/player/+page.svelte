@@ -69,9 +69,8 @@ let instrStr = $derived(String(instr).replace(/\b,\b/g,"<br>"));
 	<p>Left Centre = <b>{midiToSPN(maps[engine.currentKeyboardMode]['d'] + engine.transposeValue + engine.octave * 12 + engine.resolveMod('d'))}</b> / Right Centre = <b>{midiToSPN(maps[engine.currentKeyboardMode]['k'] + engine.transposeValue + engine.octave * 12 + engine.resolveMod('k'))}</b></p>
 	<p>Transpose: <b>{currentTranspose}</b> ({transposeToNote(currentTranspose)}) / Octave: <b>{currentOctave}</b></p>
 	<!-- <p>Sustain: <b>{currentSustain}</b> / SAWR: {currentSAWR}{(currentSAWR) ? `; Delay: ${currentSAWRDelay}` : ``}</p> -->
-	<p>Sustain: <b>{currentSustain}</b>{@html (currentSAWR) ? `; Delay: <b>${currentSAWRDelay}</b>` : ``}</p>
-	<p>Instrument: <b>{instrRegistry.find(instr => instr.id == audio.currentInstrumentId)?.displayName}</b></p>
-	<!-- <p>{keys}</p> -->
+	<p>Instrument: <b>{instrRegistry.find(instr => instr.id == audio.currentInstrumentId)?.displayName}</b> / Sustain: <b>{currentSAWR}</b>{@html (currentSAWR) ? `; Delay: <b>${currentSAWRDelay}</b>` : ``}</p>
+	<!-- <p>Preset: <b>{}</b></p> -->
 </div>
   
   <SettingsWrapper {engine} {audio}/>

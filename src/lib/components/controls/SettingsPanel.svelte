@@ -286,7 +286,7 @@ function resetAll() {
         <span class="text-sm">Keyboard mode</span>
         <div class="mt-1">
             <SegmentedControl
-                options={[{value:0,label:'+12'},{value:1,label:'+1'},{value:2,label:'−1'}]}
+                options={[{value:0,label:'+12'},{value:1,label:'+1'},{value:2,label:'−1'},{value:3,label:'Equal'}]}
                 value={engine.currentKeyboardMode}
                 onSelect={(v) => engine.setKeyboardMode(v)}
             />
