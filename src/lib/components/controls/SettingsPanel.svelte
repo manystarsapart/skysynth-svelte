@@ -382,7 +382,7 @@ function resetAll() {
     </div>
     <div class="text-sm py-0">
         Made by <b><u>@manystarsapart</u></b>.<br>
-        For any feedback, please contact support@skysynth.space. <br>
+        For any feedback, please contact <u><a href="mailto:support@skysynth.space">support@skysynth.space</a></u>. <br>
         Current SkySynth version: {skyStates.skysynthVersion} <br>
         Last updated: {skyStates.skysynthLastUpdateDate} <br>
         <br>

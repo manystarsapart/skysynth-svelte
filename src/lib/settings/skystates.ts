@@ -1,6 +1,6 @@
 export const skyStates = {
     // VERSIONING
-    skysynthVersion: "1.0.0",
+    skysynthVersion: "1.0.0-beta",
     skysynthLastUpdateDate: "2026-09-22",
     skysynthSheetVersion: "1.2",
 
