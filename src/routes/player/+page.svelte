@@ -5,6 +5,7 @@ import { listAvailableInstrumentIds } from "$lib/audio/instrAssets";
   import { instrRegistry } from "$lib/audio/instrRegistry";
 import SettingsWrapper from "$lib/components/controls/SettingsWrapper.svelte";
 import KeyboardHalf from "$lib/components/keyboard/KeyboardHalf.svelte";
+  import OrientationGate from "$lib/components/OrientationGate.svelte";
 import { createKeyboardEngine } from "$lib/engine/keyboardEngine.svelte";
 import { handleKeydown, handleKeyup } from "$lib/engine/keyHandler";
 import { maps } from "$lib/engine/maps";
@@ -64,6 +65,8 @@ let instrStr = $derived(String(instr).replace(/\b,\b/g,"<br>"));
 		}
 	}}
 />
+
+<OrientationGate />
 
 <div class="absolute p-5 text-xl">
 	<p>Left Centre = <b>{midiToSPN(maps[engine.currentKeyboardMode]['d'] + engine.transposeValue + engine.octave * 12 + engine.resolveMod('d'))}</b> / Right Centre = <b>{midiToSPN(maps[engine.currentKeyboardMode]['k'] + engine.transposeValue + engine.octave * 12 + engine.resolveMod('k'))}</b></p>

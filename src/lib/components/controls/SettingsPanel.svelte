@@ -16,6 +16,7 @@ import { assignPreset, clearPreset, presetState, renamePreset } from "$lib/setti
 import { applySettingsFile, buildSettingsFile } from "$lib/settings/apply";
 import { log } from "$lib/utils/logging";
   import { skyStates } from "$lib/settings/skystates";
+  import { formatTime, resetStats, statsState } from "$lib/stats/counters.svelte";
 
 // ========================
 // INIT
@@ -369,9 +370,16 @@ function resetAll() {
 <section class="rounded-2xl bg-gray-800/40 p-4 space-y-4">
     <div class="flex items-center justify-between">
         <h3 class="text-xs uppercase tracking-wide opacity-50">Statistics</h3>
+        <button type="button" onpointerdown={resetStats}
+            class="text-xs px-2 py-1 rounded bg-gray-800 opacity-70">Reset statistics</button>
     </div>
 
-    WIP.
+    <div class="text-md py-0">
+        Total keypresses: {statsState.cumulativeKeypress} <br>
+        Total time on player: {formatTime(statsState.cumulativeTime)} <br>
+    </div>
+     
+
 
 </section>
 

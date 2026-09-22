@@ -1,5 +1,6 @@
 import type { AudioEngine } from "$lib/audio/audioEngine.svelte";
 import { loadPresetForKey } from "$lib/settings/presets.svelte";
+import { incrementKeypress } from "$lib/stats/counters.svelte";
 import { log } from "$lib/utils/logging";
 import { playNoteDownAnimation, playNoteUpAnimation } from "$lib/visual/keyAnimations";
 import { type KeyboardEngine } from "./keyboardEngine.svelte";
@@ -50,6 +51,7 @@ export function handleKeydown(e: KeyboardEvent, engine: KeyboardEngine, audio: A
         if (midi !== null) {
             audio.play(midi);
             playNoteDownAnimation(trackedKey, engine.getSAWR);
+            incrementKeypress();
         };
 
         return;

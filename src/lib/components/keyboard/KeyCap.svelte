@@ -2,9 +2,10 @@
     import type { KeyboardEngine } from '$lib/engine/keyboardEngine.svelte';
     import type { AudioEngine } from '$lib/audio/audioEngine.svelte';
     import { visualStates } from '$lib/visual/menu.svelte';
-  import { onDestroy, onMount } from 'svelte';
-  import { playNoteDownAnimation, playNoteUpAnimation, registerKeyElement, unregisterKeyElement } from '$lib/visual/keyAnimations';
-  import { midiToNote, midiToOctave } from '$lib/utils/helpers';
+    import { onDestroy, onMount } from 'svelte';
+    import { playNoteDownAnimation, playNoteUpAnimation, registerKeyElement, unregisterKeyElement } from '$lib/visual/keyAnimations';
+    import { midiToNote, midiToOctave } from '$lib/utils/helpers';
+    import { incrementKeypress } from '$lib/stats/counters.svelte';
   
     let { keyId, engine, audio, svgPattern }: {
         keyId: string; engine: KeyboardEngine; audio: AudioEngine; svgPattern: number;
@@ -21,6 +22,7 @@
         if (midi === null) return;
         audio.play(midi);
         playNoteDownAnimation(keyId, engine.getSAWR);
+        incrementKeypress();
     }
     function up(e: PointerEvent) {
         e.preventDefault();
