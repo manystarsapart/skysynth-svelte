@@ -24,12 +24,15 @@ export interface InstrumentMeta {
     { id: 'kalimba', displayName: 'Kalimba', spriteCount: 0, kind: 'sampler', sustain: false }, // default sprite
     { id: 'musicbox', displayName: 'Music Box', spriteCount: 0, kind: 'sampler', sustain: false }, // default sprite
     { id: 'panflute', displayName: 'Panflute', spriteCount: 0, kind: 'sampler', sustain: false }, // default sprite
-    
-    // TODO MORE
-    
-
     { id: 'piano', displayName: 'Piano', spriteCount: 10, kind: 'sampler', sustain: false, recSAWRdelay: 50 },
-    // { id: 'grandpiano',  displayName: 'Grand Piano', spriteCount: 0,  kind: 'sampler', sustain: false },
+    { id: 'pipa', displayName: 'Pipa', spriteCount: 0, kind: 'sampler', sustain: false }, // default sprite
+    { id: 'rhodeskeyboard', displayName: 'Rhodes Keyboard', spriteCount: 0, kind: 'sampler', sustain: true, recSAWRdelay: 75 }, // default sprite
+    { id: 'saxophone_long', displayName: 'Saxophone (Long)', spriteCount: 0, kind: 'sampler', sustain: true, recSAWRdelay: 50 }, // default sprite
+    { id: 'saxophone_short', displayName: 'Saxophone (Short)', spriteCount: 0, kind: 'sampler', sustain: false }, // default sprite
+    { id: 'violin_long', displayName: 'Violin (Long)', spriteCount: 0, kind: 'sampler', sustain: true, recSAWRdelay: 100 }, // default sprite
+    { id: 'violin_short', displayName: 'Violin (Short)', spriteCount: 0, kind: 'sampler', sustain: false }, // default sprite
+    { id: 'xylophone', displayName: 'Xylophone', spriteCount: 0, kind: 'sampler', sustain: false }, // default sprite
+    
 
     // TODO!!!!!! OTHERS SOON!
 
