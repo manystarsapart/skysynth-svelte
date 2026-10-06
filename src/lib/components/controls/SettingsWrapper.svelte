@@ -10,7 +10,6 @@ let { engine, audio }: {
     audio: AudioEngine;
 } = $props();
 
-// let visual = $derived(visualStates);
 let open = $derived(visualStates.settingsOpen);
 
 </script>

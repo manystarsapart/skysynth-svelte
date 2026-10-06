@@ -1,5 +1,16 @@
 <script lang="ts">
+  import { browser } from "$app/environment";
+
   // import Tutorial from "$lib/components/Tutorial.svelte";
+
+  if (browser) {
+    document.addEventListener('keydown', (e) => {
+            if (e.key === ' ') {
+                window.location.href = "./player/";
+            }
+        })
+  }
+
 
 </script>
 <h1 class="text-center text-7xl p-4">SkySynth</h1>

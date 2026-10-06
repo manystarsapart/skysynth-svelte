@@ -11,12 +11,14 @@ import SegmentedControl from "./SegmentedControl.svelte";
 import Stepper from "./Stepper.svelte";
 import { transposeMap } from "$lib/engine/maps";
 import { SETTINGS_FILE_EXT, SETTINGS_VERSION, type SkySettingsFile } from "$lib/settings/schema";
-import { getFormattedDateTimeForDownload } from "$lib/utils/helpers";
+import { formatTime, getFormattedDateTimeForDownload } from "$lib/utils/helpers";
 import { assignPreset, clearPreset, presetState, renamePreset } from "$lib/settings/presets.svelte";
 import { applySettingsFile, buildSettingsFile } from "$lib/settings/apply";
 import { log } from "$lib/utils/logging";
-  import { skyStates } from "$lib/settings/skystates";
-  import { formatTime, resetStats, statsState } from "$lib/stats/counters.svelte";
+import { skyStates } from "$lib/settings/skystates";
+import { resetStats, statsState } from "$lib/stats/counters.svelte";
+import CollapsibleSection from "./CollapsibleSection.svelte";
+  import { allSectionsClosed, setAllSections } from "./sectionState.svelte";
 
 // ========================
 // INIT
@@ -109,6 +111,8 @@ function renameLabel(slot: { index: number; file: SkySettingsFile | null; label:
     log(`[PRESET] Renamed slot ${slot.index} to ${newLabel}.`);
 }
 
+let allClosed = $derived(allSectionsClosed());
+
 // ========================
 // RESET
 // ========================
@@ -127,14 +131,18 @@ function resetAll() {
     <div class="flex items-center justify-between">
         <h2 class="text-base font-semibold">Settings</h2>
         <div class="flex items-center gap-2">
+            <button type="button" onclick={() => setAllSections(allClosed)}
+                class="text-xs px-3 py-1.5 rounded-lg bg-gray-800 opacity-80">
+                {allClosed ? 'Expand all' : 'Collapse all'}
+            </button>
             <button
                 type="button"
-                onpointerdown={resetAll}
+                onclick={resetAll}
                 class="text-xs px-3 py-2 rounded-lg bg-gray-800 opacity-80 hover:opacity-100"
             >Reset all</button>
             <button
             type="button"
-            onpointerdown={() => visualStates.settingsOpen = false}
+            onclick={() => visualStates.settingsOpen = false}
             class="h-11 w-11 rounded-xl bg-gray-800
                 flex items-center justify-center"
             aria-label="Close settings"
@@ -145,243 +153,227 @@ function resetAll() {
     </div>
 </div>
 
-
-<!-- LIVE IMPORT / EXPORT  -->
-<section class="rounded-2xl bg-gray-800/40 p-4 space-y-4">
-    <div class="flex items-center justify-between">
-        <h3 class="text-xs uppercase tracking-wide opacity-50">IMPORT / EXPORT</h3>
-    </div>
-
-    <input
+<!-- IMPORT / EXPORT -->
+<CollapsibleSection title="Import / Export">
+    {#snippet children()}
+        <input
         bind:this={fileInput}
         type="file"
         accept="{SETTINGS_FILE_EXT},application/json"
         class="hidden"
         onchange={handleImportFile}
-    />
+        />
 
-    <div class="flex gap-2 px-1 pb-2 border-b border-gray-700">
-        <button type="button" onpointerdown={exportSettings}
-            class="flex-1 h-10 rounded-lg bg-gray-700 text-sm">Export settings</button>
-        <button type="button" onpointerdown={triggerImport}
-            class="flex-1 h-10 rounded-lg bg-gray-700 text-sm">Import settings</button>
-    </div>
-</section>
+        <div class="flex gap-2 px-1 pb-2 border-b border-gray-700">
+            <button type="button" onclick={exportSettings}
+                class="flex-1 h-10 rounded-lg bg-gray-700 text-sm">Export settings</button>
+            <button type="button" onclick={triggerImport}
+                class="flex-1 h-10 rounded-lg bg-gray-700 text-sm">Import settings</button>
+        </div>
+    {/snippet}
+</CollapsibleSection>
 
 <!-- PRESET -->
-<input
-    bind:this={fileInput}
-    type="file"
-    accept="{SETTINGS_FILE_EXT},application/json"
-    class="hidden"
-    onchange={handleImportFile}
-/>
-
-<section class="rounded-2xl bg-gray-800/40 p-4 space-y-4">
-    <div class="flex items-center justify-between">
-        <h3 class="text-xs uppercase tracking-wide opacity-50">Presets (Alt + number)</h3>
-    </div>
-    <div class="grid grid-cols-3 gap-2">
-        {#each presetState.slots as slot (slot.index)}
-            <div class="rounded-lg bg-gray-700 p-2 flex flex-col gap-1">
-                <span class="text-xs opacity-70">Alt+{slot.index}</span>
-                {#if slot.file}
-                    <div class="flex justify-around">
-                        <span class="text-sm truncate">{slot.label || `Preset ${slot.index}`}</span>
-                        <button onpointerdown={() => renameLabel(slot)}>✎</button>
+<CollapsibleSection title="Presets (Alt + number)">
+    {#snippet children()}
+        <div class="grid grid-cols-3 gap-2">
+            {#each presetState.slots as slot (slot.index)}
+                <div class="rounded-lg bg-gray-700 p-2 flex flex-col gap-1">
+                    <span class="text-xs opacity-70">Alt+{slot.index}</span>
+                    {#if slot.file}
+                        <div class="flex justify-around">
+                            <span class="text-sm truncate">{slot.label || `Preset ${slot.index}`}</span>
+                            <button onclick={() => renameLabel(slot)}>✎</button>
+                            
+                        </div>
                         
-                    </div>
-                    
-                    <div class="flex gap-1">
-                        <button onpointerdown={() => loadSlot(slot.file)}
-                            class="flex-1 text-xs rounded bg-teal-600 py-1">Load</button>
-                        <button onpointerdown={() => clearPreset(slot.index)}
-                            class="text-xs rounded bg-gray-600 px-2">✕</button>
-                    </div>
-                {:else}
-                    <button onpointerdown={() => assignPreset(slot.index, buildSettingsFile(engine, audio))}
-                        class="text-xs rounded bg-gray-600 py-1">Save current</button>
-                    <button onpointerdown={() => triggerImportToSlot(slot.index)}
-                        class="text-xs rounded bg-gray-600 py-1">Upload file</button>
-                {/if}
-            </div>
-        {/each}
-    </div>
-</section>
-
-<!-- AUDIO -->
-<section class="rounded-2xl bg-gray-800/40 p-4 space-y-4">
-    <div class="flex items-center justify-between">
-
-        <h3 class="text-xs uppercase tracking-wide opacity-50">Audio</h3>
-        <button type="button" onpointerdown={() => audio.resetToDefaults()}
-            class="text-xs px-2 py-1 rounded bg-gray-800 opacity-70">Reset</button>
-    </div>
-
-    <div>
-        <span class="text-sm">Instrument</span>
-        <div class="flex gap-2 overflow-x-auto snap-x snap-mandatory pb-2 mt-1 touch-pan-x">
-            {#each listAvailableInstrumentIds() as id}
-                <button
-                    type="button"
-                    onpointerdown={
-                        async() => {
-                            await audio.loadInstrument(id);
-                            engine.applyRecommendedSAWR(audio.isSustain, audio.currentSAWRDelay);
-                        }
-                    }
-                    class="snap-start shrink-0 h-11 px-4 rounded-full text-sm whitespace-nowrap transition-colors
-                           {audio.currentInstrumentId === id ? 'bg-teal-600 text-white' : 'bg-gray-700 text-gray-300'}"
-                >{instrRegistry.find(instr => instr.id == id)?.displayName}</button>
+                        <div class="flex gap-1">
+                            <button onclick={() => loadSlot(slot.file)}
+                                class="flex-1 text-xs rounded bg-teal-600 py-1">Load</button>
+                            <button onclick={() => clearPreset(slot.index)}
+                                class="text-xs rounded bg-gray-600 px-2">✕</button>
+                        </div>
+                    {:else}
+                        <button onclick={() => assignPreset(slot.index, buildSettingsFile(engine, audio))}
+                            class="text-xs rounded bg-gray-600 py-1">Save current</button>
+                        <button onclick={() => triggerImportToSlot(slot.index)}
+                            class="text-xs rounded bg-gray-600 py-1">Upload file</button>
+                    {/if}
+                </div>
             {/each}
         </div>
-    </div>
+    {/snippet}
+</CollapsibleSection>
 
-    <LabelledSlider
-        label="Volume"
-        value={audio.volumePercent}
-        min={0} max={100}
-        unit="%"
-        onInput={(v) => audio.setVolumePercent(v)}
-    />
+<!-- AUDIO -->
+<CollapsibleSection title="Audio">
+    {#snippet actions()}
+        <button type="button" onclick={() => audio.resetToDefaults()}
+            class="text-xs px-2 py-1 rounded bg-gray-800 opacity-70">Reset</button>
+    {/snippet}
+    {#snippet children()}
+        <div>
+            <span class="text-sm">Instrument</span>
+            <div class="flex gap-2 overflow-x-auto snap-x snap-mandatory pb-2 mt-1 touch-pan-x">
+                {#each listAvailableInstrumentIds() as id}
+                    <button
+                        type="button"
+                        onclick={
+                            async() => {
+                                await audio.loadInstrument(id);
+                                engine.applyRecommendedSAWR(audio.isSustain, audio.currentSAWRDelay);
+                            }
+                        }
+                        class="snap-start shrink-0 h-11 px-4 rounded-full text-sm whitespace-nowrap transition-colors
+                            {audio.currentInstrumentId === id ? 'bg-teal-600 text-white' : 'bg-gray-700 text-gray-300'}"
+                    >{instrRegistry.find(instr => instr.id == id)?.displayName}</button>
+                {/each}
+            </div>
+        </div>
 
-    <div class="flex items-center justify-between py-2">
-        <span class="text-sm">Stop Audio When Released</span>
-        <ToggleSwitch
-            checked={engine.getSAWR}
-            label="Toggle SAWR"
-            onToggle={() => engine.toggleSAWR()}
+        <LabelledSlider
+            label="Volume"
+            value={audio.volumePercent}
+            min={0} max={100}
+            unit="%"
+            onInput={(v) => audio.setVolumePercent(v)}
         />
-    </div>
 
-    {#if engine.getSAWR}
-        <div transition:slide={{ duration: 150 }}>
-            <LabelledSlider
-                label="Release delay"
-                value={engine.sawrDelay}
-                min={0} max={2000} step={10}
-                unit="ms"
-                onInput={(v) => engine.setSAWRDelay(v)}
+        <div class="flex items-center justify-between py-2">
+            <span class="text-sm">Stop Audio When Released</span>
+            <ToggleSwitch
+                checked={engine.getSAWR}
+                label="Toggle SAWR"
+                onToggle={() => engine.toggleSAWR()}
             />
         </div>
-    {/if}
 
-    <p class="text-xs opacity-50">
-        Recommended for {instrRegistry.find(i => i.id === audio.currentInstrumentId)?.displayName}:
-        {audio.isSustain ? `delayed release (${audio.currentSAWRDelay}ms)` : 'no delayed release needed'}
-    </p>
-    <button class="p-2 w-full h-10 rounded-lg bg-gray-700 text-sm"
-        onpointerdown={() => engine.applyRecommendedSAWR(audio.isSustain, audio.currentSAWRDelay)}>
-        Apply recommended settings
-    </button>
-</section>
+        {#if engine.getSAWR}
+            <div transition:slide={{ duration: 150 }}>
+                <LabelledSlider
+                    label="Release delay"
+                    value={engine.sawrDelay}
+                    min={0} max={2000} step={10}
+                    unit="ms"
+                    onInput={(v) => engine.setSAWRDelay(v)}
+                />
+            </div>
+        {/if}
 
-<!-- ENGINE -->
-<section class="space-y-3rounded-2xl bg-gray-800/40 p-4 space-y-4">
-    <div class="flex items-center justify-between">
-        <h3 class="text-xs uppercase tracking-wide opacity-50">Keyboard</h3>
-        <button type="button" onpointerdown={() => engine.resetToDefaults()}
+        <p class="text-xs opacity-50">
+            Recommended for {instrRegistry.find(i => i.id === audio.currentInstrumentId)?.displayName}:
+            {audio.isSustain ? `delayed release (${audio.currentSAWRDelay}ms)` : 'no delayed release needed'}
+        </p>
+        <button class="p-2 w-full h-10 rounded-lg bg-gray-700 text-sm"
+            onclick={() => engine.applyRecommendedSAWR(audio.isSustain, audio.currentSAWRDelay)}>
+            Apply recommended settings
+        </button>
+    {/snippet}
+</CollapsibleSection>
+
+<!-- KEYBOARD -->
+<CollapsibleSection title="Keyboard">
+    {#snippet actions()}
+        <button type="button" onclick={() => engine.resetToDefaults()}
             class="text-xs px-2 py-1 rounded bg-gray-800 opacity-70">Reset</button>
-    </div>
+    {/snippet}
+    {#snippet children()}
+        <div>
+            <span class="text-sm">Keyboard mode</span>
+            <div class="mt-1">
+                <SegmentedControl
+                    options={[{value:0,label:'+12'},{value:1,label:'+1'},{value:2,label:'−1'},{value:3,label:'Equal'}]}
+                    value={engine.currentKeyboardMode}
+                    onSelect={(v) => engine.setKeyboardMode(v)}
+                />
+            </div>
+        </div>
 
-    <div>
-        <span class="text-sm">Keyboard mode</span>
-        <div class="mt-1">
-            <SegmentedControl
-                options={[{value:0,label:'+12'},{value:1,label:'+1'},{value:2,label:'−1'},{value:3,label:'Equal'}]}
-                value={engine.currentKeyboardMode}
-                onSelect={(v) => engine.setKeyboardMode(v)}
+        <Stepper
+            label="Transpose"
+            value={engine.transposeValue}
+            displayValue={String(transposeMap[engine.transposeValue])}
+            onDecrement={() => engine.transposeBy(-1)}
+            onIncrement={() => engine.transposeBy(1)}
+            disabledDown={engine.transposeValue <= 0}
+            disabledUp={engine.transposeValue >= 12}
+        />
+
+        <Stepper
+            label="Octave"
+            value={engine.octave}
+            onDecrement={() => engine.octaveBy(-1)}
+            onIncrement={() => engine.octaveBy(1)}
+            disabledDown={engine.octave <= -2}
+            disabledUp={engine.octave >= 3}
+        />
+    {/snippet}
+</CollapsibleSection>
+
+<CollapsibleSection title="Visual">
+    {#snippet actions()}
+        <button type="button" onclick={resetVisualDefaults}
+            class="text-xs px-2 py-1 rounded bg-gray-800 opacity-70">Reset</button>
+    {/snippet}
+    {#snippet children()}
+
+        <LabelledSlider label="Character size [TODO]" value={visualStates.charSpriteSizePercent}
+            min={10} max={100} unit="%" onInput={(v) => visualStates.charSpriteSizePercent = v} />
+
+        <LabelledSlider label="Note size" value={visualStates.notesSizePercent}
+            min={30} max={200} unit="%" onInput={(v) => visualStates.notesSizePercent = v} />
+
+        <LabelledSlider label="Note spacing (vertical)" value={visualStates.noteSpacingV}
+            min={0} max={5} step={0.1} onInput={(v) => visualStates.noteSpacingV = v} />
+
+        <LabelledSlider label="Note spacing (horizontal)" value={visualStates.noteSpacingH}
+            min={0} max={5} step={0.1} onInput={(v) => visualStates.noteSpacingH = v} />
+
+        <LabelledSlider label="Keyboard position" value={visualStates.keyboardPosition}
+            min={0} max={80} onInput={(v) => visualStates.keyboardPosition = v} />
+
+        <div class="flex items-center justify-between py-2">
+            <span class="text-sm">Reduced animations</span>
+            <ToggleSwitch
+                checked={visualStates.reducedAnimations}
+                label="Toggle reduced animations"
+                onToggle={() => visualStates.reducedAnimations = !visualStates.reducedAnimations}
             />
         </div>
-    </div>
 
-    <Stepper
-        label="Transpose"
-        value={engine.transposeValue}
-        displayValue={String(transposeMap[engine.transposeValue])}
-        onDecrement={() => engine.transposeBy(-1)}
-        onIncrement={() => engine.transposeBy(1)}
-        disabledDown={engine.transposeValue <= 0}
-        disabledUp={engine.transposeValue >= 12}
-    />
+        <div class="flex items-center justify-between py-2">
+            <span class="text-sm">Show note names</span>
+            <ToggleSwitch
+                checked={visualStates.showDetailedNoteNames}
+                label="Show note names"
+                onToggle={() => visualStates.showDetailedNoteNames = !visualStates.showDetailedNoteNames}
+            />
+        </div>
 
-    <Stepper
-        label="Octave"
-        value={engine.octave}
-        onDecrement={() => engine.octaveBy(-1)}
-        onIncrement={() => engine.octaveBy(1)}
-        disabledDown={engine.octave <= -2}
-        disabledUp={engine.octave >= 3}
-    />
-</section>
-
-<!-- VISUAL -->
-<section class="rounded-2xl bg-gray-800/40 p-4 space-y-4">
-    <div class="flex items-center justify-between">
-        <h3 class="text-xs uppercase tracking-wide opacity-50">Visual</h3>
-        <button type="button" onpointerdown={resetVisualDefaults}
-            class="text-xs px-2 py-1 rounded bg-gray-800 opacity-70">Reset</button>
-    </div>
-
-    <LabelledSlider label="Character size [TODO]" value={visualStates.charSpriteSizePercent}
-        min={10} max={100} unit="%" onInput={(v) => visualStates.charSpriteSizePercent = v} />
-
-    <LabelledSlider label="Note size" value={visualStates.notesSizePercent}
-        min={30} max={200} unit="%" onInput={(v) => visualStates.notesSizePercent = v} />
-
-    <LabelledSlider label="Note spacing (vertical)" value={visualStates.noteSpacingV}
-        min={0} max={5} step={0.1} onInput={(v) => visualStates.noteSpacingV = v} />
-
-    <LabelledSlider label="Note spacing (horizontal)" value={visualStates.noteSpacingH}
-        min={0} max={5} step={0.1} onInput={(v) => visualStates.noteSpacingH = v} />
-
-    <LabelledSlider label="Keyboard position" value={visualStates.keyboardPosition}
-        min={0} max={80} onInput={(v) => visualStates.keyboardPosition = v} />
-
-    <div class="flex items-center justify-between py-2">
-        <span class="text-sm">Reduced animations</span>
-        <ToggleSwitch
-            checked={visualStates.reducedAnimations}
-            label="Toggle reduced animations"
-            onToggle={() => visualStates.reducedAnimations = !visualStates.reducedAnimations}
-        />
-    </div>
-
-    <div class="flex items-center justify-between py-2">
-        <span class="text-sm">Show note names</span>
-        <ToggleSwitch
-            checked={visualStates.showDetailedNoteNames}
-            label="Show note names"
-            onToggle={() => visualStates.showDetailedNoteNames = !visualStates.showDetailedNoteNames}
-        />
-    </div>
-
-    <div class="flex items-center justify-between py-2">
-        <span class="text-sm">Show key outline</span>
-        <ToggleSwitch
-            checked={visualStates.showKeyOutline}
-            label="Show key outline"
-            onToggle={() => visualStates.showKeyOutline = !visualStates.showKeyOutline}
-        />
-    </div>
-</section>
+        <div class="flex items-center justify-between py-2">
+            <span class="text-sm">Show key outline</span>
+            <ToggleSwitch
+                checked={visualStates.showKeyOutline}
+                label="Show key outline"
+                onToggle={() => visualStates.showKeyOutline = !visualStates.showKeyOutline}
+            />
+        </div>
+    {/snippet}
+</CollapsibleSection>
 
 <!-- STATISTICS -->
-<section class="rounded-2xl bg-gray-800/40 p-4 space-y-4">
-    <div class="flex items-center justify-between">
-        <h3 class="text-xs uppercase tracking-wide opacity-50">Statistics</h3>
-        <button type="button" onpointerdown={resetStats}
-            class="text-xs px-2 py-1 rounded bg-gray-800 opacity-70">Reset statistics</button>
-    </div>
-
-    <div class="text-md py-0">
-        Total keypresses: {statsState.cumulativeKeypress} <br>
-        Total time on player: {formatTime(statsState.cumulativeTime)} <br>
-    </div>
-     
-
-
-</section>
+<CollapsibleSection title="Statistics">
+    {#snippet actions()}
+        <button type="button" onclick={resetStats}
+            class="text-xs px-2 py-1 rounded bg-gray-800 opacity-70">Reset</button>
+    {/snippet}
+    {#snippet children()}
+        <div class="text-md py-0">
+            Total keypresses: <b>{statsState.cumulativeKeypress}</b> <br>
+            Total time on player: <b>{formatTime(statsState.cumulativeTime)}</b> <br>
+        </div>
+    {/snippet}
+</CollapsibleSection>
 
 <!-- ACKNOWLEDGEMENTS -->
 <section class="rounded-2xl bg-gray-800/40 p-4 space-y-4">
@@ -397,7 +389,4 @@ function resetAll() {
         Github Repo: <a href="https://github.com/manystarsapart/skysynth-svelte"><u>skysynth-svelte</u></a>
 
     </div>
-    
-
-
 </section>
