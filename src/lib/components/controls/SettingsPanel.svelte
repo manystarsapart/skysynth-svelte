@@ -118,7 +118,7 @@ let allClosed = $derived(allSectionsClosed());
 // ========================
 
 function resetAll() {
-    if (!confirm('Reset ALL settings (audio, keyboard, visual) to defaults? This cannot be undone.')) return;
+    if (!confirm('Reset ALL settings (audio, keyboard, visual) to defaults? This cannot be undone.\nNote that statistics will NOT be reset.')) return;
     audio.resetToDefaults();
     engine.resetToDefaults();
     resetVisualDefaults();
@@ -153,29 +153,23 @@ function resetAll() {
     </div>
 </div>
 
-<!-- IMPORT / EXPORT -->
-<CollapsibleSection title="Import / Export">
-    {#snippet children()}
-        <input
-        bind:this={fileInput}
-        type="file"
-        accept="{SETTINGS_FILE_EXT},application/json"
-        class="hidden"
-        onchange={handleImportFile}
-        />
-
-        <div class="flex gap-2 px-1 pb-2 border-b border-gray-700">
-            <button type="button" onclick={exportSettings}
-                class="flex-1 h-10 rounded-lg bg-gray-700 text-sm">Export settings</button>
-            <button type="button" onclick={triggerImport}
-                class="flex-1 h-10 rounded-lg bg-gray-700 text-sm">Import settings</button>
-        </div>
-    {/snippet}
-</CollapsibleSection>
-
-<!-- PRESET -->
+<!-- PRESETS -->
 <CollapsibleSection title="Presets (Alt + number)">
     {#snippet children()}
+    <input
+    bind:this={fileInput}
+    type="file"
+    accept="{SETTINGS_FILE_EXT},application/json"
+    class="hidden"
+    onchange={handleImportFile}
+    />
+        <div class="flex gap-2 px-1 pb-2 border-b border-gray-700">
+            <button type="button" onclick={exportSettings}
+                class="flex-1 h-10 rounded-lg bg-gray-700 text-sm">Export Preset</button>
+            <button type="button" onclick={triggerImport}
+                class="flex-1 h-10 rounded-lg bg-gray-700 text-sm">Import & Apply</button>
+        </div>
+    
         <div class="grid grid-cols-3 gap-2">
             {#each presetState.slots as slot (slot.index)}
                 <div class="rounded-lg bg-gray-700 p-2 flex flex-col gap-1">

@@ -9,6 +9,7 @@ import { toggleSettingsOpen } from "$lib/visual/menu.svelte";
 import { DEFAULT_KEYBOARD, type KeyboardSettings } from "$lib/settings/schema";
 import { browser } from "$app/environment";
 import { debounce, loadFromStorage, saveToStorage } from "$lib/settings/storage";
+import { allSectionsClosed, setAllSections } from "$lib/components/controls/sectionState.svelte";
 
 // ====================================================
 // KEYBOARD ENGINE
@@ -179,6 +180,16 @@ export function createKeyboardEngine() {
                 toggleSettingsOpen();
                 break;
             case "tab":
+                setAllSections(allSectionsClosed());
+                // setAllSections(false);
+
+                
+                // TEMP: collapse every section
+
+
+                // OR: PRESET FLIP 
+
+
                 // TODO: SWAP TO THE LAST-ACTIVATED INSTRUMENT WITH PREVIOUS SETTINGS.
                 // "INSTRUMENT FLIP"
                 // NEED TO CACHE A COPY OF THE PREVIOUS INSTRUMENT'S SETTINGS?

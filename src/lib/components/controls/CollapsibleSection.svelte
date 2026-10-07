@@ -2,6 +2,7 @@
 import { onMount, type Snippet } from 'svelte';
 import { slide } from 'svelte/transition';
 import { sectionOpen } from './sectionState.svelte';
+  import { log } from '$lib/utils/logging';
 
 let { title, id = title, defaultOpen = true, children, actions }: {
         title: string;
@@ -17,15 +18,16 @@ onMount(() => {
     if (!(id in sectionOpen)) sectionOpen[id] = defaultOpen;
 });
 
-function toggle() { sectionOpen[id] = !open; }
-
+function toggle() { 
+    sectionOpen[id] = !open; 
+}
 </script>
 
 <section class="rounded-2xl bg-gray-800/40 p-4 space-y-4">
     <button
         type="button"
         class="flex items-center justify-between w-full text-left"
-        onclick={() => open = !open}
+        onclick={toggle}
         // trying onclick because it apparently should work. 
         // onpointerdown triggers whenever you want to scroll as well which is causing a bunch of clunk
         aria-expanded={open}
