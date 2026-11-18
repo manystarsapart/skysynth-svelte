@@ -1,5 +1,26 @@
 @import 'tailwindcss';
 
+
+:root { --bg: #262626; --heading: #1A3A5F; --fg: #dcdcdc; --button: rgb(31, 31, 31); --accent: teal; }
+/* :root { --bg: #D0E7F9; --fg: #1C2938; --accent: #314A43; --heading: #0F1423 } */
+/* :root { --bg: #F9F4DC; --fg: #101F30; --accent: #2F4F4F; --heading: #1D3F5A; --button: #1A3A5F; } */
+/* :root { --bg: #EEF7F2; --heading: #0F1423; --fg: #3B3A3E; --button: #1A3A5F; --accent: #3B7C7F; } */
+/* :root { --bg: #B0D8E8; --heading: #1A3A5F; --fg: #2C2C2C; --button: #1772B4; --accent: #8E354A; } */
+
+html {
+    background-color: rgba(0,0,0,0.85);
+    color: gainsboro;
+} 
+
+@theme inline {
+    --color-heading: var(--heading);
+    --color-fg: var(--fg);
+    --color-accent: var(--accent);
+    --color-button: var(--button);
+}
+
+html { background-color: var(--bg); color: var(--fg); }
+
 html, body {
     /* PREVENT USER GESTURES */
     overscroll-behavior: none;
@@ -10,10 +31,7 @@ html, body {
     -webkit-tap-highlight-color: transparent;
 }
 
-html {
-    background-color: rgba(0,0,0,0.85);
-    color: gainsboro;
-}
+
 
 img, .character-image {
     /* PREVENT USER GESTURES ON IMG */

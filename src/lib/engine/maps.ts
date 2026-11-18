@@ -122,3 +122,12 @@ export const keySvgPattern: number[][] = [
     [3, 2, 1, 2, 3],
     [3, 2, 3, 2, 1],
 ];
+
+export const modKeys = [
+    { id: 'shiftL', label: 'Shift L', desc: '-12 L' },
+    { id: 'altL',   label: 'Alt L', desc: '+1 L' },
+    { id: ' ',      label: 'Space', desc: '+12 Both' },
+    { id: 'enter',  label: 'Enter', desc: '+1 Both' },
+    { id: 'altR',   label: 'Alt R', desc: '+1 R' },
+    { id: 'shiftR', label: 'Shift R', desc: '-12 Both' },
+  ];

@@ -2,14 +2,15 @@
 import { browser } from "$app/environment";
 import { createAudioEngine } from "$lib/audio/audioEngine.svelte";
 import { listAvailableInstrumentIds } from "$lib/audio/instrAssets";
-  import { instrRegistry } from "$lib/audio/instrRegistry";
+import { instrRegistry } from "$lib/audio/instrRegistry";
 import SettingsWrapper from "$lib/components/controls/SettingsWrapper.svelte";
 import KeyboardHalf from "$lib/components/keyboard/KeyboardHalf.svelte";
-  import OrientationGate from "$lib/components/OrientationGate.svelte";
+import ModKey from "$lib/components/keyboard/ModKey.svelte";
+import OrientationGate from "$lib/components/OrientationGate.svelte";
 import { createKeyboardEngine } from "$lib/engine/keyboardEngine.svelte";
 import { handleKeydown, handleKeyup } from "$lib/engine/keyHandler";
-import { maps } from "$lib/engine/maps";
-  import { presetState } from "$lib/settings/presets.svelte";
+import { maps, modKeys } from "$lib/engine/maps";
+import { presetState } from "$lib/settings/presets.svelte";
 import { loadFromStorage } from "$lib/settings/storage";
 import { midiToSPN, transposeToNote } from "$lib/utils/helpers";
 import { log } from "$lib/utils/logging";
@@ -45,12 +46,14 @@ onMount(async () => { // THIS IS ASYNC SO INSTRUMENT LOADS BEFORE WE DEAL WITH T
 			audio.prewarmInstrument(slot.file.audio.instrumentId);
 		}
 	}
+	
 });
   
   
 let instr = $derived(listAvailableInstrumentIds());
 let instrStr = $derived(String(instr).replace(/\b,\b/g,"<br>"));
   
+let screenSize
   
   </script>
   
@@ -65,7 +68,6 @@ let instrStr = $derived(String(instr).replace(/\b,\b/g,"<br>"));
 		}
 	}}
 />
-
 <OrientationGate />
 
 <div class="absolute p-5 text-xl">
@@ -77,12 +79,22 @@ let instrStr = $derived(String(instr).replace(/\b,\b/g,"<br>"));
 </div>
   
   <SettingsWrapper {engine} {audio}/>
-  
+
+  <!-- {#if < 600} -->
+  <div class="absolute flex justify-center gap-2 pt-4 left-0 right-0">
+	{#each modKeys as m (m.id)}
+	  <ModKey keyId={m.id} label={m.label} desc={m.desc} {engine} />
+	{/each}
+  </div>
+  <!-- {/if} -->
+
   <div class="flex text-center justify-evenly text-4xl"
 	style:padding-top="{visualStates.keyboardPosition}rem"
   >
 	<div><KeyboardHalf side="left" {engine} {audio} /></div>
 	<div><KeyboardHalf side="right" {engine} {audio} /></div>
+
+
 	
   </div>
   <br>

@@ -52,8 +52,10 @@
     style:transition={engine.getSAWR ? "none" : "0.3s ease-out"}
     style:width="{visualStates.notesSizePercent * 6 / 100}rem"
     style:outline="{visualStates.showKeyOutline ? "gray solid 0.2rem" : "none"}"
+    aria-pressed={engine.pressedKeys.has(keyId)}
     onpointerdown={down}
     onpointerup={up}
+    onpointercancel={up}
 >
 <div 
     class="absolute p-0 m-0 b-0 gap-0" 
@@ -81,7 +83,7 @@
     }
 
     .key-active {
-        background-color: teal;
+        background-color: var(--accent);
         transition: none !important; /* the important here overrides the base transition when it applied */
     }
 

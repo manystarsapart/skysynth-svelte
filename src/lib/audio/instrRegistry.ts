@@ -36,6 +36,11 @@ export interface InstrumentMeta {
 
     // TODO!!!!!! OTHERS SOON!
 
+    // VCSL
+    { id: 'concertharp_VCSL', displayName: 'Concert Harp (VCSL)', spriteCount: 0, kind: 'sampler', sustain: false }, // default sprite
+    { id: 'xylophone_VCSL', displayName: 'Xylophone (VCSL)', spriteCount: 0, kind: 'sampler', sustain: false }, // default sprite
+    { id: 'marimba_VCSL', displayName: 'Marimba (VCSL)', spriteCount: 0, kind: 'sampler', sustain: false }, // default sprite
+    { id: 'tubularbells_VCSL', displayName: 'Tubular Bells (VCSL)', spriteCount: 0, kind: 'sampler', sustain: false }, // default sprite
 
     // SYNTHS
     { id: 'synth', displayName: 'Synth', spriteCount: 0, kind: 'synth', sustain: true, recSAWRdelay: 50, synthType: 'basic' },
